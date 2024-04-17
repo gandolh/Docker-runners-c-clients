@@ -11,6 +11,9 @@
 #include "HTTP_Server.h"
 #include "Routes.h"
 #include "Response.h"
+#include "Code_Run_Lib.h"
+#include "REST_Api_Handler.h"
+
 
 #define CLIENT_BUFFER_SIZE 4096
 // 1024 * 1024 = 1KB
@@ -81,8 +84,17 @@ void MatchRoute(struct Route *route, char *urlRoute, char *response_data)
 	// Rest API endpoints
 	if (strstr(urlRoute, "/api/") != NULL)
 	{
+		if (strstr(urlRoute, "/api/compile") != NULL)
+		{
+			// TODO: call api handler
+			printf("Compiling code\n");
+		}
+		else if(strstr(urlRoute, "/api/run") != NULL)
+		{
+			// TODO: call API handler
+			printf("Running code\n");
+		}
 
-		strcpy(response_data, "hello from server");
 		return;
 	}
 
@@ -91,6 +103,10 @@ void MatchRoute(struct Route *route, char *urlRoute, char *response_data)
 
 int main()
 {
+    InitContainersThreadpool();
+	codeRunLib_RunDemo();
+	return 0;
+
 	HTTP_Server http_server;
 	struct Route *route;
 	int client_socket;
