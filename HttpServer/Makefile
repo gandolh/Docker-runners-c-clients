@@ -15,8 +15,13 @@ $(exec): $(objects)
 
 
 clean:
-	-rm *.out
-	-rm *.o
-	-rm *.a
-	-rm src/*.a
-	-rm src/*.o
+	-rm -f *.out 
+	-rm -f *.o
+	-rm -f *.a
+	-rm -f src/*.a
+	-rm -f src/*.o
+
+run:
+	-make clean
+	-make
+	-./$(exec)

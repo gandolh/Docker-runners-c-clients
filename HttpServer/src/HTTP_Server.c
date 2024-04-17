@@ -7,15 +7,25 @@ void init_server(HTTP_Server * http_server, int port) {
 	http_server->port = port;
 
 	int server_socket = socket(AF_INET, SOCK_STREAM, 0);
+	if (server_socket == -1) {
+        perror("Error creating socket");
+        return;
+    }
 
 	struct sockaddr_in server_address;
 	server_address.sin_family = AF_INET;
 	server_address.sin_port = htons(port);
 	server_address.sin_addr.s_addr = INADDR_ANY;
 
-	bind(server_socket, (struct sockaddr *) &server_address, sizeof(server_address));
+	if (bind(server_socket, (struct sockaddr *) &server_address, sizeof(server_address)) == -1) {
+        perror("Error binding socket");
+        return;
+    }
 
-	listen(server_socket, 5);
+	if (listen(server_socket, 5) == -1) {
+        perror("Error listening on socket");
+        return;
+    }
 
 	http_server->socket = server_socket;
 	printf("HTTP Server Initialized\nPort: %d\n", http_server->port);
