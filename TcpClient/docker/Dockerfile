@@ -6,7 +6,7 @@ RUN apk add python3
 RUN apk add rust
 
 
-COPY codeRunner.c /app/
+COPY codeRunner.c cJSON.c cJSON.h /app/
 WORKDIR /app
-RUN gcc -o codeRunner codeRunner.c
+RUN gcc -o codeRunner codeRunner.c cJSON.c -lm
 CMD ["./codeRunner"]

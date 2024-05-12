@@ -8,44 +8,13 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdarg.h>
+#include "cJSON.h"
 
 #define PORT 8080
 #define MAX_QUEUE 5
 #define REQ_BUFFER_SIZE 1024
 #define RES_BUFFER_SIZE 1024
 
-void handleMessage(char *request, char *buffer)
-{
-    // Split the request into method and params
-    char *method = strtok(request, ":");
-    char *params = strtok(NULL, ":");
-
-    // Check the method and set the buffer accordingly
-    if (strncmp(method, "COMPILE_C_CODE", 14) == 0)
-    {
-        sprintf(buffer, "refId:%s", params);
-    }
-    else if (strncmp(method, "COMPILE_RUST_CODE", 17) == 0)
-    {
-        sprintf(buffer, "rustc %s", params);
-    }
-    else if (strncmp(method, "RUN_COMPILED_C_CODE", 19) == 0)
-    {
-        sprintf(buffer, "./%s", params);
-    }
-    else if (strncmp(method, "RUN_COMPILED_RUST_CODE", 22) == 0)
-    {
-        sprintf(buffer, "./%s", params);
-    }
-    else if (strncmp(method, "RUN_PYTHON_CODE", 15) == 0)
-    {
-        sprintf(buffer, "python3 %s", params);
-    }
-    else
-    {
-        write_log("Invalid request type\n");
-    }
-}
 
 void write_log(const char *format, ...) {
     FILE *file = fopen("logs.txt", "a");
@@ -83,6 +52,40 @@ void create_log_file() {
     fclose(file);
     write_log("Log file created");
 }
+
+void handleMessage(char *request, char *buffer)
+{
+    // Split the request into method and params
+    write_log("handling this: %s \n", request);
+    char *method = strtok(request, ":");
+    char *params = strtok(NULL, ":");
+    // Check the method and set the buffer accordingly
+    if (strncmp(method, "COMPILE_C_CODE", 14) == 0)
+    {
+        sprintf(buffer, "refId:%s", params);
+    }
+    else if (strncmp(method, "COMPILE_RUST_CODE", 17) == 0)
+    {
+        sprintf(buffer, "rustc %s", params);
+    }
+    else if (strncmp(method, "RUN_COMPILED_C_CODE", 19) == 0)
+    {
+        sprintf(buffer, "./%s", params);
+    }
+    else if (strncmp(method, "RUN_COMPILED_RUST_CODE", 22) == 0)
+    {
+        sprintf(buffer, "./%s", params);
+    }
+    else if (strncmp(method, "RUN_PYTHON_CODE", 15) == 0)
+    {
+        sprintf(buffer, "python3 %s", params);
+    }
+    else
+    {
+        write_log("Invalid request type\n");
+    }
+}
+
 
 
 int main()
