@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+
 char * render_static_file(char * fileName) {
 	FILE* file = fopen(fileName, "r");
 

@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "http_server.h": "c"
+        "time.h": "c",
+        "stdarg.h": "c"
     }
 }
