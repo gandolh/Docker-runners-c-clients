@@ -30,7 +30,7 @@ typedef struct REST_CodeRunResp
 
 int codeRunLib_RunDemo();
 void InitContainersThreadpool();
-REST_CompileResp* CompileCCode(REST_CompileReq* req);
+REST_CompileResp* CompileCCode(char* req);
 REST_CompileResp* CompileRustCode(REST_CompileReq* req);
 REST_CodeRunResp* RunCCode(REST_CodeRunReq *req);
 REST_CodeRunResp* RunRustCode(REST_CodeRunReq *req);
