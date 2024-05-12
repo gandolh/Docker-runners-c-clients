@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "gdb": "^0.1.0-pre"
+  }
+}

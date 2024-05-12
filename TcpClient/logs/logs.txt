@@ -1,0 +1,3 @@
+Sun 2024-05-12 19:14:05 - Log file created
+Sun 2024-05-12 19:14:10 - Container 0 port: 8080
+
