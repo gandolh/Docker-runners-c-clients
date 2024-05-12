@@ -1,8 +1,9 @@
 CC = gcc
-CFLAGS = -Iinclude
-DEPS = include/HTTP_Server.h include/Routes.h include/Response.h include/Code_Run_Lib.h include/REST_Api_Handler.h include/Logger.h
-OBJ = src/main.o include/HTTP_Server.o include/Routes.o include/Response.o include/Code_Run_Lib.o include/REST_Api_Handler.o include/Logger.o
-
+CFLAGS = -Iinclude -Ilibs
+DEPS = include/HTTP_Server.h include/Routes.h include/Response.h include/Code_Run_Lib.h include/REST_Api_Handler.h include/Logger.h \
+libs/cJSON.h
+OBJ = src/main.o include/HTTP_Server.o include/Routes.o include/Response.o include/Code_Run_Lib.o include/REST_Api_Handler.o include/Logger.o \
+libs/cJSON.o
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 

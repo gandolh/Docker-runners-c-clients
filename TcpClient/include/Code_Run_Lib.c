@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "Logger.h"
+#include "cJSON.h"
 
 #define MAX_ID_LENGTH 65
 #define NUM_CONTAINERS 1
@@ -148,12 +149,10 @@ REST_CodeRunResp *ToREST_CodeRunResp(char *response)
     return result;
 }
 
-REST_CompileResp *CompileCCode(REST_CompileReq *req)
+REST_CompileResp *CompileCCode(char* json)
 {
     char msg[REQ_BUFFER_SIZE] = "COMPILE_C_CODE:";
-    char serialized_req[REQ_BUFFER_SIZE];
-    sprintf(serialized_req, "language:%s,code:%s", req->language, req->code);
-    strcat(msg, serialized_req);
+    strcat(msg, json);
     char *response = malloc(RES_BUFFER_SIZE);
     SendRequest(getAvailablePort(), msg, response);
     REST_CompileResp *result = ToREST_CompileResp(response);
@@ -214,17 +213,49 @@ REST_CodeRunResp *RunPythonCode(REST_CodeRunReq *req)
     return result;
 }
 
+char* createRestCompileReqJson(REST_CompileReq const req){
+    cJSON *compileReq = cJSON_CreateObject();
+    char *string = NULL;
+    if (compileReq == NULL)
+    {
+        goto endCreateRestCompileReqJson;
+    }
+
+    if (cJSON_AddStringToObject(compileReq, "code", req.code) == NULL)
+    {
+        goto endCreateRestCompileReqJson;
+    }
+    if (cJSON_AddStringToObject(compileReq, "language", req.language) == NULL)
+    {
+        goto endCreateRestCompileReqJson;
+    }
+     string = cJSON_Print(compileReq);
+    if (string == NULL)
+    {
+        perror("Failed to print compileReq.\n");
+    }
+
+endCreateRestCompileReqJson:
+    cJSON_Delete(compileReq);
+    return string;
+}
+
+int Test_CompileCCode(){
+    REST_CompileReq compileReq;
+    compileReq.code = "#include <stdio.h>\nint main(){\nprintf(\"Hello World\");\nreturn 0;\n}";
+    compileReq.language = "C";
+    char* json = createRestCompileReqJson(compileReq);
+    REST_CompileResp *resp = CompileCCode(json);
+    free(json);
+    // printf("RefId: %s\n", resp->refId);
+
+}
+
 int codeRunLib_RunDemo()
 {
 
     printContainersPorts();
 
-    char *response = malloc(RES_BUFFER_SIZE);
-    REST_CompileReq compileReq;
-    compileReq.code = "Your C source code here";
-    compileReq.language = "C";
-    REST_CompileResp *resp = CompileCCode(&compileReq);
-    // printf("RefId: %s\n", resp->refId);
-    free(response);
+    Test_CompileCCode();
     return 0;
 }
