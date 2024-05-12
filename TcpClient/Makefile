@@ -1,22 +1,20 @@
-CC=gcc
-CFLAGS=-Iinclude
-DEPS = HTTP_Server.h
-exec = server.o
-sources = $(wildcard src/*.c)
-objects = $(sources:.c=.o)
-flags = -g -Wall -lm -ldl -fPIC -rdynamic -I./include
-# flags = -I./include
+CC = gcc
+CFLAGS = -Iinclude
+DEPS = include/HTTP_Server.h include/Routes.h include/Response.h
+OBJ = src/main.o include/HTTP_Server.o include/Routes.o include/Response.o
 
-$(exec): $(objects)
-	$(CC) $(objects) $(flags) -o $(exec)
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
 
-%.o: %.c %.h
-	$(CC) -c $(flags) $< -o $@
+server: $(OBJ)
+	$(CC) -o $@ $^ $(CFLAGS)
 
+.PHONY: clean
 
 clean:
-	-rm *.out
-	-rm *.o
-	-rm *.a
-	-rm src/*.a
-	-rm src/*.o
+	rm -f $(OBJ) server
+
+start: server
+	./server
+
+run: clean server start
