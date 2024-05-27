@@ -155,7 +155,8 @@ REST_CompileResp *CompileCCode(char* json)
     strcat(msg, json);
     char *response = malloc(RES_BUFFER_SIZE);
     SendRequest(getAvailablePort(), msg, response);
-    REST_CompileResp *result = ToREST_CompileResp(response);
+    write_log("Response: %s\n", response);
+    // REST_CompileResp *result = ToREST_CompileResp(response);
     // free(response);
     // return result;
     return NULL;
@@ -253,9 +254,7 @@ int Test_CompileCCode(){
 
 int codeRunLib_RunDemo()
 {
-
     printContainersPorts();
-
     Test_CompileCCode();
     return 0;
 }

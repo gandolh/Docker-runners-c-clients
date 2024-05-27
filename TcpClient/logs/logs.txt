@@ -1,3 +1,10 @@
-Mon 2024-05-13 00:15:32 - Log file created
-Mon 2024-05-13 00:15:36 - Container 0 port: 8080
+Tue 2024-05-28 00:28:36 - Log file created
+Tue 2024-05-28 00:28:39 - Container 0 port: 8080
+
+Tue 2024-05-28 00:28:39 - Response: {
+	"status":	"success",
+	"filename":	"code/1716845319.c",
+	"stdout":	"",
+	"stderr":	""
+}
 

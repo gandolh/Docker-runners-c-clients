@@ -15,7 +15,7 @@
 #define MAX_QUEUE 5
 #define REQ_BUFFER_SIZE 1024
 #define RES_BUFFER_SIZE 1024
-
+#define FILE_NAME_SIZE 50
 
 void write_log(const char *format, ...) {
     FILE *file = fopen("logs.txt", "a");
@@ -54,32 +54,54 @@ void create_log_file() {
     write_log("Log file created");
 }
 
-int writeAndCompileC(const char* code){
-    mkdir("code", 0777);
-    time_t now = time(NULL);
-    char filename[50];
-    snprintf(filename, sizeof(filename), "code/%ld.c", now);
-    FILE *fd = fopen(filename, "w");
-        if (fd == NULL) {
-            perror("fopen");
-            exit(EXIT_FAILURE);
-        }
+char* generate_json_resp(const char* status, const char* filename, const char* stdout, const char* stderr) {
+    cJSON *root = cJSON_CreateObject();
 
-   if (fwrite(code, sizeof(char), strlen(code), fd) != strlen(code)) {
-        perror("fwrite");
+    cJSON_AddStringToObject(root, "status", status);
+    cJSON_AddStringToObject(root, "filename", filename);
+    cJSON_AddStringToObject(root, "stdout", stdout);
+    cJSON_AddStringToObject(root, "stderr", stderr);
+
+    char *json_string = cJSON_Print(root);
+
+    cJSON_Delete(root);
+
+    return json_string;
+}
+
+char* writeAndCompile(const char* code, const char* compiler, const char* extension){
+    mkdir("code", 0777);
+
+    // Get current time
+    time_t now = time(NULL);
+
+    // Create filename
+    char filename[50];
+    snprintf(filename, sizeof(filename), "code/%ld.%s", now, extension);
+
+    // Open file
+    FILE *file = fopen(filename, "w");
+    if (file == NULL) {
+        perror("fopen");
         exit(EXIT_FAILURE);
     }
 
-    fclose(fd);
-    sleep(1);
+    if (fwrite(code, sizeof(char), strlen(code), file) != strlen(code)) {
+        perror("fwrite");
+        exit(EXIT_FAILURE);
+    }
+    fclose(file);
+
     write_log("File created: %s\n", filename);
     
+    // Create pipes for inter-process communication
     int pipefd[2];
     if (pipe(pipefd) == -1) {
         perror("pipe");
         exit(EXIT_FAILURE);
     }
 
+    // Fork a new process
     pid_t pid = fork();
     if (pid == -1) {
         perror("fork");
@@ -91,11 +113,11 @@ int writeAndCompileC(const char* code){
         dup2(pipefd[1], STDERR_FILENO);  // Redirect stderr to the pipe
         close(pipefd[1]);  // Close the write end of the pipe in the child
 
-
-        execlp("gcc", "gcc", filename, "-o", "code/tmp", NULL);
+        // Execute the compiler
+        execlp(compiler, compiler, filename, NULL);
         perror("execlp");
         exit(EXIT_FAILURE);
-    }else{
+    } else {
         close(pipefd[1]);  // Close the write end of the pipe in the parent
         char buffer[5120];
         ssize_t count;
@@ -110,13 +132,16 @@ int writeAndCompileC(const char* code){
         waitpid(pid, &status, 0);
         if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
             write_log("Compilation successful\n");
-            return 0;
+            return generate_json_resp("success", filename, "", "");
         } else {
             write_log("Compilation failed\n");
-            return 1;
+            return generate_json_resp("error", "", "", "");
         }
     }
 }
+
+
+
 
 void handleMessage(char *request, char *buffer)
 {
@@ -156,12 +181,14 @@ void handleMessage(char *request, char *buffer)
     // Check the method and set the buffer accordingly
     if (strncmp(method, "COMPILE_C_CODE", 14) == 0)
     {
-        int ok =  writeAndCompileC(code);
-        sprintf(buffer, "%s", ok == 0 ? "Compilation successful" : "Compilation failed");
+        char* respJson =  writeAndCompile(code, "gcc", "c");
+        strcpy(buffer, respJson);
+        free(respJson);
+       
     }
     else if (strncmp(method, "COMPILE_RUST_CODE", 17) == 0)
     {
-        sprintf(buffer, "rustc %s", params);
+        sprintf(buffer, "rustc %s", params);  
     }
     else if (strncmp(method, "RUN_COMPILED_C_CODE", 19) == 0)
     {
