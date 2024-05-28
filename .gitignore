@@ -55,3 +55,8 @@ src/*.o
 *.o
 .cache/
 *swp*
+TcpClient/.vscode/settings.json
+TcpClient/.vscode/c_cpp_properties.json
+.vscode/c_cpp_properties.json
+TcpClient/.vscode/settings.json
+TcpClient/.vscode/settings.json
