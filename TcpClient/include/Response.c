@@ -2,32 +2,25 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "Logger.h"
 
-char *render_static_file(char *fileName)
+void render_static_file(char *fileName, char *response_data, int readSize)
 {
 	FILE *file = fopen(fileName, "r");
-
 	if (file == NULL)
 	{
-		return NULL;
-	}
-	else
-	{
-		printf("%s does exist \n", fileName);
+		write_log("Failed to open file");
+		return;
 	}
 
-	fseek(file, 0, SEEK_END);
-	long fsize = ftell(file);
-	fseek(file, 0, SEEK_SET);
-
-	char *temp = malloc(sizeof(char) * (fsize + 1));
-	char ch;
-	int i = 0;
-	while ((ch = fgetc(file)) != EOF)
+	size_t bytesRead = fread(response_data, 1, readSize, file);
+	if (bytesRead < readSize)
 	{
-		temp[i] = ch;
-		i++;
+		if (feof(file))
+			write_log("End of file reached.\n");
+		else if (ferror(file))
+			write_log("Error reading file");
 	}
+
 	fclose(file);
-	return temp;
 }

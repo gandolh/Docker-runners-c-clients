@@ -306,7 +306,6 @@ int Test_CompileAndRunCCode()
 
 int Test_CompileAndRunRustCode()
 {
-
     CodeRunnerResponse *resp = CompileRustCode("fn main() {\n"
                                                "    println!(\"Hello, world!\");\n"
                                                "}\n");

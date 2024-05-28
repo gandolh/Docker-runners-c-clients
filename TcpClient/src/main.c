@@ -16,31 +16,10 @@
 #include "Logger.h"
 
 #define CLIENT_BUFFER_SIZE 4096
-// 1024 * 1024 = 1KB
-#define RESPONSE_BUFFER_SIZE 4096
+#define RESPONSE_DATA_BUFFER_SIZE 4096
+#define HEADER_BUFFER_SIZE 20
+#define RESPONSE_BUFFER_SIZE RESPONSE_DATA_BUFFER_SIZE + HEADER_BUFFER_SIZE
 #define PORT 6969
-
-void GetMethodAndRoute(char client_msg[CLIENT_BUFFER_SIZE], char **method, char **urlRoute)
-{
-	char *client_http_header = strtok(client_msg, "\n");
-	// printf("\n\n%s\n\n", client_http_header);
-	char *header_token = strtok(client_http_header, " ");
-	int header_parse_counter = 0;
-	while (header_token != NULL)
-	{
-		switch (header_parse_counter)
-		{
-		case 0:
-			*method = header_token;
-			break;
-		case 1:
-			*urlRoute = header_token;
-			break;
-		}
-		header_token = strtok(NULL, " ");
-		header_parse_counter++;
-	}
-}
 
 void MatchRoute(struct Route *route, char *urlRoute, char *response_data)
 {
@@ -51,17 +30,15 @@ void MatchRoute(struct Route *route, char *urlRoute, char *response_data)
 	if (matchedRoute != NULL)
 	{
 		strcat(templatePath, matchedRoute->value);
-		char *pageContent = render_static_file(templatePath);
-		strcpy(response_data, pageContent);
-		free(pageContent);
+		render_static_file(templatePath, response_data, RESPONSE_DATA_BUFFER_SIZE);
+		write_log("response_data: %s\n", response_data);
 		return;
 	}
 
 	// resources like css and js
 	if (strstr(urlRoute, "/static/") != NULL)
 	{
-		char *pageContent = render_static_file("static/index.css");
-		strcpy(response_data, pageContent);
+		render_static_file("static/index.css", response_data, RESPONSE_DATA_BUFFER_SIZE);
 		return;
 	}
 
@@ -82,7 +59,7 @@ void MatchRoute(struct Route *route, char *urlRoute, char *response_data)
 		return;
 	}
 
-	response_data = render_static_file("templates/404.html");
+	render_static_file("templates/404.html", response_data, RESPONSE_DATA_BUFFER_SIZE);
 }
 
 int main()
@@ -109,12 +86,18 @@ int main()
 	printf("=========ALL VAILABLE ROUTES========\n");
 	inorder(route);
 
+	// request got from client
+	char client_msg[CLIENT_BUFFER_SIZE] = "";
+	// response data to be sent to client. No header included
+	char *response_data = malloc(RESPONSE_DATA_BUFFER_SIZE);
+	// response data with header
+	char *response = malloc(RESPONSE_BUFFER_SIZE);
 	// start listening to client
 	while (1)
 	{
-		char client_msg[CLIENT_BUFFER_SIZE] = "";
-		char *response_data = malloc(RESPONSE_BUFFER_SIZE);
-		char *response = malloc(RESPONSE_BUFFER_SIZE * 2);
+		memset(client_msg, 0, CLIENT_BUFFER_SIZE);
+		memset(response_data, 0, RESPONSE_DATA_BUFFER_SIZE);
+		memset(response, 0, RESPONSE_BUFFER_SIZE);
 
 		client_socket = accept(http_server.socket, NULL, NULL);
 		read(client_socket, client_msg, CLIENT_BUFFER_SIZE - 1);
@@ -122,31 +105,50 @@ int main()
 		// parsing client socket header to get HTTP method, route
 		char *method = "";
 		char *urlRoute = "";
-		GetMethodAndRoute(client_msg, &method, &urlRoute);
+
+		char *client_http_header = strtok(client_msg, "\n");
+
+		printf("\n\n%s\n\n", client_http_header);
+
+		char *header_token = strtok(client_http_header, " ");
+
+		int header_parse_counter = 0;
+
+		while (header_token != NULL)
+		{
+
+			switch (header_parse_counter)
+			{
+			case 0:
+				method = header_token;
+				break;
+			case 1:
+				urlRoute = header_token;
+				break;
+			}
+			header_token = strtok(NULL, " ");
+			header_parse_counter++;
+		}
+
 		printf("The method is %s\n", method);
 		printf("The route is %s\n", urlRoute);
 
+		// match route
 		MatchRoute(route, urlRoute, response_data);
 		// compose response
-		char http_header[4096] = "HTTP/1.1 200 OK\r\n\r\n";
-		strcat(response, http_header);
-		strcat(response, response_data);
-		// strcat(response, "\r\n\r\n");
-
-		// send response, close socket, free data
-		// printf("Response: %s\n", response);
-		ssize_t bytes_sent = send(client_socket, response, strlen(response), 0);
+		char http_header[HEADER_BUFFER_SIZE] = "HTTP/1.1 200 OK\r\n\r\n";
+		snprintf(response, RESPONSE_BUFFER_SIZE, "%s%s", http_header, response_data);
+		// write_log("Response: %s\n", response);
+		ssize_t bytes_sent = send(client_socket, response, RESPONSE_BUFFER_SIZE, 0);
 		if (bytes_sent == -1)
 		{
 			perror("Error sending response");
 			close(client_socket);
-			free(response_data);
-			free(response);
-			return -1;
+			break;
 		}
 		close(client_socket);
-		free(response_data);
-		free(response);
 	}
+	free(response_data);
+	free(response);
 	return 0;
 }
