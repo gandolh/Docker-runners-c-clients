@@ -1,0 +1,16 @@
+Tue 2024-05-28 23:38:28 - Log file created
+Tue 2024-05-28 23:38:32 - bind socket to port 6969
+Tue 2024-05-28 23:38:32 - Listening on port 6969
+Tue 2024-05-28 23:38:32 - HTTP Server Initialized
+Port: 6969
+
+Tue 2024-05-28 23:44:29 - End of file reached.
+
+Tue 2024-05-28 23:44:45 - End of file reached.
+
+Tue 2024-05-28 23:48:05 - End of file reached.
+
+Tue 2024-05-28 23:48:32 - End of file reached.
+
+Tue 2024-05-28 23:48:55 - End of file reached.
+
