@@ -11,15 +11,18 @@
 #include <time.h>
 #include <stdarg.h>
 #include "cJSON.h"
+#include "uuid4.h"
 #define PORT 8080
 #define MAX_QUEUE 5
 #define REQ_BUFFER_SIZE 1024
 #define RES_BUFFER_SIZE 1024
 #define FILE_NAME_SIZE 50
 
-void write_log(const char *format, ...) {
+void write_log(const char *format, ...)
+{
     FILE *file = fopen("logs.txt", "a");
-    if (file == NULL) {
+    if (file == NULL)
+    {
         printf("Error opening file!\n");
         return;
     }
@@ -43,9 +46,11 @@ void write_log(const char *format, ...) {
     fclose(file);
 }
 
-void create_log_file() {
+void create_log_file()
+{
     FILE *file = fopen("logs.txt", "w");
-    if (file == NULL) {
+    if (file == NULL)
+    {
         write_log("Error opening file!\n");
         return;
     }
@@ -54,7 +59,8 @@ void create_log_file() {
     write_log("Log file created");
 }
 
-char* generate_json_resp(const char* status, const char* filename, const char* stdout, const char* stderr) {
+char *generate_json_resp(const char *status, const char *filename, const char *stdout, const char *stderr)
+{
     cJSON *root = cJSON_CreateObject();
 
     cJSON_AddStringToObject(root, "status", status);
@@ -69,91 +75,228 @@ char* generate_json_resp(const char* status, const char* filename, const char* s
     return json_string;
 }
 
-char* writeAndCompile(const char* code, const char* compiler, const char* extension){
+char *writeAndCompile(const char *code, const char *compiler, const char *extension)
+{
     mkdir("code", 0777);
+    mkdir("submissions", 0777);
 
     // Get current time
-    time_t now = time(NULL);
+    char buf[UUID4_LEN];
+    uuid4_init();
+    uuid4_generate(buf);
 
     // Create filename
     char filename[50];
-    snprintf(filename, sizeof(filename), "code/%ld.%s", now, extension);
+    snprintf(filename, sizeof(filename), "code/%s.%s", buf, extension);
+    // Create executable filename
+    char exec_filename[50];
+    snprintf(exec_filename, sizeof(exec_filename), "submissions/%s", buf);
 
     // Open file
     FILE *file = fopen(filename, "w");
-    if (file == NULL) {
+    if (file == NULL)
+    {
         perror("fopen");
         exit(EXIT_FAILURE);
     }
 
-    if (fwrite(code, sizeof(char), strlen(code), file) != strlen(code)) {
+    if (fwrite(code, sizeof(char), strlen(code), file) != strlen(code))
+    {
         perror("fwrite");
         exit(EXIT_FAILURE);
     }
     fclose(file);
 
     write_log("File created: %s\n", filename);
-    
-    // Create pipes for inter-process communication
-    int pipefd[2];
-    if (pipe(pipefd) == -1) {
-        perror("pipe");
-        exit(EXIT_FAILURE);
-    }
 
     // Fork a new process
     pid_t pid = fork();
-    if (pid == -1) {
+    if (pid == -1)
+    {
         perror("fork");
         exit(EXIT_FAILURE);
     }
-    if (pid == 0) {
-        close(pipefd[0]);  // Close the read end of the pipe in the child
-        dup2(pipefd[1], STDOUT_FILENO);  // Redirect stdout to the pipe
-        dup2(pipefd[1], STDERR_FILENO);  // Redirect stderr to the pipe
-        close(pipefd[1]);  // Close the write end of the pipe in the child
-
+    if (pid == 0)
+    {
         // Execute the compiler
-        execlp(compiler, compiler, filename, NULL);
+        execlp(compiler, compiler, filename, "-o", exec_filename, NULL);
         perror("execlp");
         exit(EXIT_FAILURE);
-    } else {
-        close(pipefd[1]);  // Close the write end of the pipe in the parent
-        char buffer[5120];
-        ssize_t count;
-        while ((count = read(pipefd[0], buffer, sizeof(buffer) - 1)) > 0) {
-            buffer[count] = '\0';
-            write_log("%s", buffer);
-        }
-        close(pipefd[0]);  // Close the read end of the pipe in the parent
-
-
-         int status;
+    }
+    else
+    {
+        int status;
         waitpid(pid, &status, 0);
-        if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+        if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+        {
             write_log("Compilation successful\n");
-            return generate_json_resp("success", filename, "", "");
-        } else {
+            return generate_json_resp("success", exec_filename, "", "");
+        }
+        else
+        {
             write_log("Compilation failed\n");
             return generate_json_resp("error", "", "", "");
         }
     }
 }
 
+char *RunCompiled(const char *exec_path)
+{
+    int stdout_pipe[2], stderr_pipe[2];
+    if (pipe(stdout_pipe) == -1 || pipe(stderr_pipe) == -1)
+    {
+        perror("pipe");
+        exit(EXIT_FAILURE);
+    }
+    // Fork a new process
+    pid_t pid = fork();
+    if (pid == -1)
+    {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+    if (pid == 0)
+    {
+        close(stdout_pipe[0]); // Close the read end of the stdout pipe in the child
+        close(stderr_pipe[0]); // Close the read end of the stderr pipe in the child
 
+        dup2(stdout_pipe[1], STDOUT_FILENO); // Redirect stdout to the stdout pipe
+        dup2(stderr_pipe[1], STDERR_FILENO); // Redirect stderr to the stderr pipe
 
+        close(stdout_pipe[1]); // Close the write end of the stdout pipe in the child
+        close(stderr_pipe[1]); // Close the write end of the stderr pipe in the child
+
+        // Execute the compiled program
+        execlp("/bin/sh", "/bin/sh", "-c", exec_path, NULL);
+        perror("execlp");
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        close(stdout_pipe[1]); // Close the write end of the stdout pipe in the parent
+        close(stderr_pipe[1]); // Close the write end of the stderr pipe in the parent
+
+        char stdout_buffer[4096], stderr_buffer[4096];
+        read(stdout_pipe[0], stdout_buffer, sizeof(stdout_buffer));
+        read(stderr_pipe[0], stderr_buffer, sizeof(stderr_buffer));
+
+        int status;
+        waitpid(pid, &status, 0);
+        if (WIFEXITED(status))
+        {
+            int exit_status = WEXITSTATUS(status);
+            // Generate a JSON response
+            char *json_resp;
+            if (strlen(stderr_buffer) > 0)
+                json_resp = generate_json_resp("error", "", stdout_buffer, stderr_buffer);
+            else
+                json_resp = generate_json_resp("success", "", stdout_buffer, stderr_buffer);
+            return json_resp;
+        }
+        else
+        {
+            char *json_resp = generate_json_resp("error", "", stdout_buffer, stderr_buffer);
+            return json_resp;
+        }
+    }
+}
+
+char *WriteSourceCode(const char *code)
+{
+    mkdir("submissions", 0777);
+
+    char buf[UUID4_LEN];
+    uuid4_init();
+    uuid4_generate(buf);
+
+    char *filename = malloc(FILE_NAME_SIZE);
+    snprintf(filename, FILE_NAME_SIZE, "submissions/%s", buf);
+
+    // Open file
+    FILE *file = fopen(filename, "w");
+    if (file == NULL)
+    {
+        perror("fopen");
+        exit(EXIT_FAILURE);
+    }
+
+    if (fwrite(code, sizeof(char), strlen(code), file) != strlen(code))
+    {
+        perror("fwrite");
+        exit(EXIT_FAILURE);
+    }
+    fclose(file);
+
+    write_log("File created: %s\n", filename);
+    return filename;
+}
+
+char *RunScript(const char *interpreter, const char *exec_path)
+{
+    int stdout_pipe[2], stderr_pipe[2];
+    if (pipe(stdout_pipe) == -1 || pipe(stderr_pipe) == -1)
+    {
+        perror("pipe");
+        exit(EXIT_FAILURE);
+    }
+    // Fork a new process
+    pid_t pid = fork();
+    if (pid == -1)
+    {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+    if (pid == 0)
+    {
+        close(stdout_pipe[0]); // Close the read end of the stdout pipe in the child
+        close(stderr_pipe[0]); // Close the read end of the stderr pipe in the child
+
+        dup2(stdout_pipe[1], STDOUT_FILENO); // Redirect stdout to the stdout pipe
+        dup2(stderr_pipe[1], STDERR_FILENO); // Redirect stderr to the stderr pipe
+
+        close(stdout_pipe[1]); // Close the write end of the stdout pipe in the child
+        close(stderr_pipe[1]); // Close the write end of the stderr pipe in the child
+
+        // Execute the compiled program
+        execlp(interpreter, interpreter, exec_path, NULL);
+        perror("execlp");
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        close(stdout_pipe[1]); // Close the write end of the stdout pipe in the parent
+        close(stderr_pipe[1]); // Close the write end of the stderr pipe in the parent
+
+        char stdout_buffer[4096], stderr_buffer[4096];
+        read(stdout_pipe[0], stdout_buffer, sizeof(stdout_buffer));
+        read(stderr_pipe[0], stderr_buffer, sizeof(stderr_buffer));
+
+        int status;
+        waitpid(pid, &status, 0);
+        if (WIFEXITED(status))
+        {
+            int exit_status = WEXITSTATUS(status);
+            // Generate a JSON response
+            char *json_resp;
+            if (strlen(stderr_buffer) > 0)
+                json_resp = generate_json_resp("error", "", stdout_buffer, stderr_buffer);
+            else
+                json_resp = generate_json_resp("success", "", stdout_buffer, stderr_buffer);
+            return json_resp;
+        }
+        else
+        {
+            char *json_resp = generate_json_resp("error", "", stdout_buffer, stderr_buffer);
+            return json_resp;
+        }
+    }
+}
 
 void handleMessage(char *request, char *buffer)
 {
-    // Split the request into method and params
-    char *method = strtok(request, ":");
-    char *params = strtok(NULL, "");   
-    cJSON *req_json = cJSON_ParseWithLength(params, REQ_BUFFER_SIZE);
-    const cJSON *code_json = NULL;
-    const cJSON *language_json = NULL;
-    const char* code = NULL;
-    const char* language = NULL;
-
+    // true if no operation was made
+    int no_op = 1;
+    cJSON *req_json = cJSON_ParseWithLength(request, REQ_BUFFER_SIZE);
     if (req_json == NULL)
     {
         const char *error_ptr = cJSON_GetErrorPtr();
@@ -164,53 +307,108 @@ void handleMessage(char *request, char *buffer)
         goto end;
     }
 
-    code_json = cJSON_GetObjectItemCaseSensitive(req_json, "code");
-    language_json = cJSON_GetObjectItemCaseSensitive(req_json, "language");
-    code = code_json->valuestring;
-    language = language_json->valuestring;
-    
-    if (!cJSON_IsString(code_json) || (code_json->valuestring == NULL))
+    const cJSON *type_json = NULL;
+    type_json = cJSON_GetObjectItemCaseSensitive(req_json, "type");
+    if (!cJSON_IsString(type_json) || (type_json->valuestring == NULL))
     {
-        write_log("code not found in request\n");
+        write_log("type not found in request\n");
     }
-    if (!cJSON_IsString(language_json) || (language_json->valuestring == NULL))
+    const char *type = type_json->valuestring;
+    if (strcmp(type, "COMPILE") == 0)
     {
-        write_log("language not found in request\n");
-    }
+        // do compile stuff
+        const cJSON *code_json = NULL;
+        const cJSON *language_json = NULL;
+        const char *code = NULL;
+        const char *language = NULL;
 
-    // Check the method and set the buffer accordingly
-    if (strncmp(method, "COMPILE_C_CODE", 14) == 0)
-    {
-        char* respJson =  writeAndCompile(code, "gcc", "c");
-        strcpy(buffer, respJson);
-        free(respJson);
-       
+        code_json = cJSON_GetObjectItemCaseSensitive(req_json, "code");
+        language_json = cJSON_GetObjectItemCaseSensitive(req_json, "language");
+        code = code_json->valuestring;
+        language = language_json->valuestring;
+
+        if (!cJSON_IsString(code_json) || (code_json->valuestring == NULL))
+        {
+            write_log("code not found in request\n");
+        }
+        if (!cJSON_IsString(language_json) || (language_json->valuestring == NULL))
+        {
+            write_log("language not found in request\n");
+        }
+
+        if (strcmp(language, "C") == 0)
+        {
+            no_op = 0;
+            char *respJson = writeAndCompile(code, "gcc", "c");
+            strcpy(buffer, respJson);
+            free(respJson);
+        }
+        else if (strcmp(language, "RUST") == 0)
+        {
+            no_op = 0;
+            char *respJson = writeAndCompile(code, "rustc", "rs");
+            strcpy(buffer, respJson);
+            free(respJson);
+        }
     }
-    else if (strncmp(method, "COMPILE_RUST_CODE", 17) == 0)
+    else if (strcmp(type, "RUN") == 0)
     {
-        sprintf(buffer, "rustc %s", params);  
+
+        const cJSON *language_json = NULL;
+        const char *language = NULL;
+        const cJSON *filename_json = NULL;
+        const char *filename = NULL;
+        const cJSON *code_json = NULL;
+        const char *code = NULL;
+
+        language_json = cJSON_GetObjectItemCaseSensitive(req_json, "language");
+        filename_json = cJSON_GetObjectItemCaseSensitive(req_json, "filename");
+        code_json = cJSON_GetObjectItemCaseSensitive(req_json, "code");
+        language = language_json->valuestring;
+        filename = filename_json->valuestring;
+        code = code_json->valuestring;
+        if (!cJSON_IsString(language_json) || (language_json->valuestring == NULL))
+        {
+            write_log("language not found in request\n");
+        }
+        if (!cJSON_IsString(filename_json) || (filename_json->valuestring == NULL))
+        {
+            write_log("filename not found in request\n");
+        }
+        if (!cJSON_IsString(code_json) || (code_json->valuestring == NULL))
+        {
+            write_log("code not found in request\n");
+        }
+
+        // do run stuff
+        if (strcmp(language, "C") == 0)
+        {
+            no_op = 0;
+            char *respJson = RunCompiled(filename);
+            sprintf(buffer, "%s", respJson);
+        }
+        else if (strcmp(language, "RUST") == 0)
+        {
+            no_op = 0;
+            char *respJson = RunCompiled(filename);
+            sprintf(buffer, "%s", respJson);
+        }
+        else if (strcmp(language, "PYTHON") == 0)
+        {
+            no_op = 0;
+            char *filename = WriteSourceCode(code);
+            char *json = RunScript("/usr/bin/python", filename);
+            sprintf(buffer, "%s", json);
+        }
     }
-    else if (strncmp(method, "RUN_COMPILED_C_CODE", 19) == 0)
-    {
-        sprintf(buffer, "./%s", params);
-    }
-    else if (strncmp(method, "RUN_COMPILED_RUST_CODE", 22) == 0)
-    {
-        sprintf(buffer, "./%s", params);
-    }
-    else if (strncmp(method, "RUN_PYTHON_CODE", 15) == 0)
-    {
-        sprintf(buffer, "python3 %s", params);
-    }
-    else
+    if (no_op == 1)
     {
         write_log("Invalid request type\n");
+        sprintf(buffer, "%s", "\"Invalid request type\"");
     }
-    end:
+end:
     cJSON_Delete(req_json);
 }
-
-
 
 int main()
 {
@@ -230,7 +428,6 @@ int main()
         exit(1);
     }
     write_log("socket created\n");
-
 
     // Initialize socket structure
     memset((char *)&serv_addr, 0, sizeof(serv_addr));

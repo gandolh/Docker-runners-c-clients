@@ -108,113 +108,8 @@ int getAvailablePort()
     return container_ports[0];
 }
 
-REST_CompileResp *ToREST_CompileResp(char *response)
+char *createRestCompileReqJson(CodeRunnerCompileRequest const req)
 {
-    REST_CompileResp *result = malloc(sizeof(REST_CompileResp));
-    char *token = strtok(response, ",");
-    while (token != NULL)
-    {
-        char propName[50];
-        char propValue[50];
-        sscanf(token, "%[^:]:%s", propName, propValue);
-        if (strcmp(propName, "refId") == 0)
-        {
-            result->refId = malloc(50);
-            strcpy(result->refId, propValue);
-        }
-        token = strtok(NULL, ",");
-    }
-    return result;
-}
-
-REST_CodeRunResp *ToREST_CodeRunResp(char *response)
-{
-    REST_CodeRunResp *result = malloc(sizeof(REST_CodeRunResp));
-    char *token = strtok(response, ",");
-    while (token != NULL)
-    {
-        char propName[50];
-        char propValue[50];
-        sscanf(token, "%[^:]:%s", propName, propValue);
-        if (strcmp(propName, "output") == 0)
-        {
-            strcpy(result->output, propValue);
-        }
-        else if (strcmp(propName, "error") == 0)
-        {
-            strcpy(result->error, propValue);
-        }
-        token = strtok(NULL, ",");
-    }
-    return result;
-}
-
-REST_CompileResp *CompileCCode(char* json)
-{
-    char msg[REQ_BUFFER_SIZE] = "COMPILE_C_CODE:";
-    strcat(msg, json);
-    char *response = malloc(RES_BUFFER_SIZE);
-    SendRequest(getAvailablePort(), msg, response);
-    write_log("Response: %s\n", response);
-    // REST_CompileResp *result = ToREST_CompileResp(response);
-    // free(response);
-    // return result;
-    return NULL;
-}
-
-REST_CompileResp *CompileRustCode(REST_CompileReq *req)
-{
-    char msg[REQ_BUFFER_SIZE] = "COMPILE_RUST_CODE:";
-    char serialized_req[REQ_BUFFER_SIZE];
-    sprintf(serialized_req, "language:%s,code:%s", req->language, req->code);
-    strcat(msg, serialized_req);
-    char *response = malloc(RES_BUFFER_SIZE);
-    SendRequest(getAvailablePort(), msg, response);
-    REST_CompileResp *result = ToREST_CompileResp(response);
-    free(response);
-    return result;
-}
-
-REST_CodeRunResp *RunCCode(REST_CodeRunReq *req)
-{
-    char msg[REQ_BUFFER_SIZE] = "RUN_COMPILED_C_CODE:";
-    char serialized_req[REQ_BUFFER_SIZE];
-    sprintf(serialized_req, "refId:%s,language:%s,code:%s", req->refId, req->language, req->code);
-    strcat(msg, serialized_req);
-    char *response = malloc(RES_BUFFER_SIZE);
-    SendRequest(getAvailablePort(), msg, response);
-    REST_CodeRunResp *result = ToREST_CodeRunResp(response);
-    free(response);
-    return result;
-}
-
-REST_CodeRunResp *RunRustCode(REST_CodeRunReq *req)
-{
-    char msg[REQ_BUFFER_SIZE] = "RUN_COMPILED_RUST_CODE:";
-    char serialized_req[REQ_BUFFER_SIZE];
-    sprintf(serialized_req, "refId:%s,language:%s,code:%s", req->refId, req->language, req->code);
-    strcat(msg, serialized_req);
-    char *response = malloc(RES_BUFFER_SIZE);
-    SendRequest(getAvailablePort(), msg, response);
-    REST_CodeRunResp *result = ToREST_CodeRunResp(response);
-    free(response);
-    return result;
-}
-
-REST_CodeRunResp *RunPythonCode(REST_CodeRunReq *req)
-{
-    char msg[REQ_BUFFER_SIZE] = "RUN_PYTHON_CODE:";
-    char serialized_req[REQ_BUFFER_SIZE];
-    sprintf(serialized_req, "refId:%s,language:%s,code:%s", req->refId, req->language, req->code);
-    strcat(msg, serialized_req);
-    char *response = malloc(RES_BUFFER_SIZE);
-    SendRequest(getAvailablePort(), msg, response);
-    REST_CodeRunResp *result = ToREST_CodeRunResp(response);
-    free(response);
-    return result;
-}
-
-char* createRestCompileReqJson(REST_CompileReq const req){
     cJSON *compileReq = cJSON_CreateObject();
     char *string = NULL;
     if (compileReq == NULL)
@@ -230,7 +125,11 @@ char* createRestCompileReqJson(REST_CompileReq const req){
     {
         goto endCreateRestCompileReqJson;
     }
-     string = cJSON_Print(compileReq);
+    if (cJSON_AddStringToObject(compileReq, "type", req.type) == NULL)
+    {
+        goto endCreateRestCompileReqJson;
+    }
+    string = cJSON_Print(compileReq);
     if (string == NULL)
     {
         perror("Failed to print compileReq.\n");
@@ -241,20 +140,189 @@ endCreateRestCompileReqJson:
     return string;
 }
 
-int Test_CompileCCode(){
-    REST_CompileReq compileReq;
-    compileReq.code = "#include <stdio.h>\nint main(){\nprintf(\"Hello World\");\nreturn 0;\n}";
-    compileReq.language = "C";
-    char* json = createRestCompileReqJson(compileReq);
-    REST_CompileResp *resp = CompileCCode(json);
-    free(json);
-    // printf("RefId: %s\n", resp->refId);
+char *createRestRunReqJson(CodeRunnerRunRequest const req)
+{
+    cJSON *runReq = cJSON_CreateObject();
+    char *string = NULL;
+    if (runReq == NULL)
+    {
+        goto endCreateRestRunReqJson;
+    }
 
+    if (cJSON_AddStringToObject(runReq, "filename", req.filename) == NULL)
+    {
+        goto endCreateRestRunReqJson;
+    }
+    if (cJSON_AddStringToObject(runReq, "language", req.language) == NULL)
+    {
+        goto endCreateRestRunReqJson;
+    }
+    if (cJSON_AddStringToObject(runReq, "type", req.type) == NULL)
+    {
+        goto endCreateRestRunReqJson;
+    }
+    if (cJSON_AddStringToObject(runReq, "code", req.code) == NULL)
+    {
+        goto endCreateRestRunReqJson;
+    }
+    string = cJSON_Print(runReq);
+    if (string == NULL)
+    {
+        perror("Failed to print runReq.\n");
+    }
+
+endCreateRestRunReqJson:
+    cJSON_Delete(runReq);
+    return string;
+}
+
+CodeRunnerResponse *deserializeCodeRunnerResponse(char *response)
+{
+    cJSON *root = cJSON_Parse(response);
+
+    if (!root)
+    {
+        write_log("error: %s\n", cJSON_GetErrorPtr());
+        return NULL;
+    }
+
+    CodeRunnerResponse *resp = malloc(sizeof(CodeRunnerResponse));
+    if (!resp)
+    {
+        perror("malloc");
+        return NULL;
+    }
+
+    cJSON *status = cJSON_GetObjectItem(root, "status");
+    cJSON *filename = cJSON_GetObjectItem(root, "filename");
+    cJSON *stdout = cJSON_GetObjectItem(root, "stdout");
+    cJSON *stderr = cJSON_GetObjectItem(root, "stderr");
+
+    if (!cJSON_IsString(status) || !cJSON_IsString(filename) || !cJSON_IsString(stdout) || !cJSON_IsString(stderr))
+    {
+        write_log("error: one or more fields are not strings\n");
+        free(resp);
+        return NULL;
+    }
+
+    resp->status = strdup(status->valuestring);
+    resp->filename = strdup(filename->valuestring);
+    resp->stdout = strdup(stdout->valuestring);
+    resp->stderr = strdup(stderr->valuestring);
+
+    cJSON_Delete(root);
+
+    return resp;
+}
+
+CodeRunnerResponse *CompileCCode(char *const code)
+{
+    CodeRunnerCompileRequest req;
+    req.code = code;
+    req.language = "C";
+    req.type = "COMPILE";
+    char *json = createRestCompileReqJson(req);
+    char *response = malloc(RES_BUFFER_SIZE);
+    SendRequest(getAvailablePort(), json, response);
+    CodeRunnerResponse *resp = deserializeCodeRunnerResponse(response);
+    free(response);
+    free(json);
+    write_log("Response status: %s\n", resp->status);
+    return resp;
+}
+
+CodeRunnerResponse *CompileRustCode(char *const code)
+{
+    CodeRunnerCompileRequest req;
+    req.code = code;
+    req.language = "RUST";
+    req.type = "COMPILE";
+    char *json = createRestCompileReqJson(req);
+    char *response = malloc(RES_BUFFER_SIZE);
+    SendRequest(getAvailablePort(), json, response);
+    CodeRunnerResponse *resp = deserializeCodeRunnerResponse(response);
+    free(response);
+    free(json);
+    write_log("Response status: %s\n", resp->status);
+    return resp;
+}
+
+CodeRunnerResponse *RunCCode(char *const filename)
+{
+    CodeRunnerRunRequest req;
+    req.filename = filename;
+    req.language = "C";
+    req.type = "RUN";
+    char *json = createRestRunReqJson(req);
+    char *response = malloc(RES_BUFFER_SIZE);
+    SendRequest(getAvailablePort(), json, response);
+    CodeRunnerResponse *resp = deserializeCodeRunnerResponse(response);
+    free(response);
+    free(json);
+    write_log("Response status: %s\n", resp->status);
+    return resp;
+}
+
+CodeRunnerResponse *RunRustCode(char *const filename)
+{
+    CodeRunnerRunRequest req;
+    req.filename = filename;
+    req.code = "";
+    req.language = "C";
+    req.type = "RUN";
+    char *json = createRestRunReqJson(req);
+    char *response = malloc(RES_BUFFER_SIZE);
+    SendRequest(getAvailablePort(), json, response);
+    CodeRunnerResponse *resp = deserializeCodeRunnerResponse(response);
+    free(response);
+    free(json);
+    write_log("Response status: %s\n", resp->status);
+    return resp;
+}
+
+CodeRunnerResponse *RunPythonCode(char *const code)
+{
+    CodeRunnerRunRequest req;
+    req.code = code;
+    req.filename = "";
+    req.language = "PYTHON";
+    req.type = "RUN";
+    char *json = createRestRunReqJson(req);
+    char *response = malloc(RES_BUFFER_SIZE);
+    SendRequest(getAvailablePort(), json, response);
+    CodeRunnerResponse *resp = deserializeCodeRunnerResponse(response);
+    free(response);
+    free(json);
+    write_log("Response python status: %s\n", resp->status);
+    return resp;
+}
+
+int Test_CompileAndRunCCode()
+{
+    CodeRunnerResponse *resp = CompileCCode("#include <stdio.h>\nint main(){\nprintf(\"Hello World\");\nreturn 0;\n}");
+    // printf("RefId: %s\n", resp->refId);
+    RunCCode(resp->filename);
+}
+
+int Test_CompileAndRunRustCode()
+{
+
+    CodeRunnerResponse *resp = CompileRustCode("fn main() {\n"
+                                               "    println!(\"Hello, world!\");\n"
+                                               "}\n");
+    RunRustCode(resp->filename);
+}
+
+int Test_RunPythonCode()
+{
+    CodeRunnerResponse *resp = RunPythonCode("print(\"Hello World\")");
 }
 
 int codeRunLib_RunDemo()
 {
     printContainersPorts();
-    Test_CompileCCode();
+    Test_CompileAndRunCCode();
+    Test_CompileAndRunRustCode();
+    Test_RunPythonCode();
     return 0;
 }

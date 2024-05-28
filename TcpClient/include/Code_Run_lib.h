@@ -1,38 +1,36 @@
 #ifndef CODE_RUN_LIB_H
 #define CODE_RUN_LIB_H
 
-typedef struct REST_CompileReq
+typedef struct CodeRunnerResponse
 {
+    char *status;
+    char *filename;
+    char *stdout;
+    char *stderr;
+} CodeRunnerResponse;
+
+typedef struct CodeRunnerCompileRequest
+{
+    // default type COMPILE for this kind of requests
+    char *type;
     char *language;
     char *code;
-} REST_CompileReq;
+} CodeRunnerCompileRequest;
 
-// refId for compilled languages
-// code and language for runtime languages
-typedef struct REST_CodeRunReq
+typedef struct CodeRunnerRunRequest
 {
-    char *refId;
-    char *language;
+    // default type RUN for this kind of requests
+    char *type;
+    char *filename;
     char *code;
-} REST_CodeRunReq;
-
-typedef struct REST_CompileResp
-{
-    char *refId;
-} REST_CompileResp;
-
-typedef struct REST_CodeRunResp
-{
-    char *output;
-    char *error;
-} REST_CodeRunResp;
-
+    char *language;
+} CodeRunnerRunRequest;
 
 int codeRunLib_RunDemo();
 void InitContainersThreadpool();
-REST_CompileResp* CompileCCode(char* req);
-REST_CompileResp* CompileRustCode(REST_CompileReq* req);
-REST_CodeRunResp* RunCCode(REST_CodeRunReq *req);
-REST_CodeRunResp* RunRustCode(REST_CodeRunReq *req);
-REST_CodeRunResp* RunPythonCode(REST_CodeRunReq *req);
+CodeRunnerResponse *CompileCCode(char *const code);
+CodeRunnerResponse *CompileRustCode(char *const req);
+CodeRunnerResponse *RunCCode(char *const filename);
+CodeRunnerResponse *RunRustCode(char *const filename);
+CodeRunnerResponse *RunPythonCode(char *const filename);
 #endif // CODE_RUN_LIB_H
