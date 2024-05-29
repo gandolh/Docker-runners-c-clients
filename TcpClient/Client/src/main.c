@@ -103,7 +103,7 @@ int main()
             initializeRequest(&request, language, code);
         }
 
-                // Here you can add the code to actually send the request to the server
+        // Here you can add the code to actually send the request to the server
 
         freeRequest(&request);
     }
