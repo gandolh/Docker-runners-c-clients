@@ -1,34 +1,92 @@
-Thu 2024-05-30 00:25:35 - Log file created
-Thu 2024-05-30 00:25:39 - bind socket to port 6969
-Thu 2024-05-30 00:25:40 - Listening on port 6969
-Thu 2024-05-30 00:25:40 - HTTP Server Initialized
+Thu 2024-05-30 01:13:14 - Log file created
+Thu 2024-05-30 01:13:19 - bind socket to port 6969
+Thu 2024-05-30 01:13:19 - Listening on port 6969
+Thu 2024-05-30 01:13:19 - HTTP Server Initialized
 Port: 6969
 
-Thu 2024-05-30 00:26:11 - Request from client: POST /api/run HTTP/1.1
-Host: localhost
+Thu 2024-05-30 01:13:21 - Request from client: POST /api/run HTTP/1.1
 Content-Type: application/json
-Content-Length: 400
+User-Agent: PostmanRuntime/7.39.0
+Accept: */*
+Cache-Control: no-cache
+Postman-Token: 3466e0fb-2afa-4c75-9afd-294c6532f730
+Host: localhost:6969
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 121
 
 {
-	"language":	"PYTHON",
-	"code":	"def is_prime(n):\n    if n <= 1:\n        return False\n    for i in range(2, n):\n        if n % i == 0:\n            return False\n    return True\n\ncount = 0\nnum = 2\nprime_numbers = []\n\nwhile count < 4:\n    if is_prime(num):\n        prime_numbers.append(num)\n        count += 1\n    num += 1\n\nprint(\"The first 4 prime numbers are:\", prime_numbers)"
+    "language": "RUST",
+    "code": "fn main() {\n println!(\"Hello, Rust!\");\n }\n",
+    "killAfterResponse": 1
 }
 
-Thu 2024-05-30 00:26:11 - Response python status: success
+Thu 2024-05-30 01:13:22 - Response status: success, stderr: , stdout: 
 
-Thu 2024-05-30 00:26:20 - Request from client: POST /api/run HTTP/1.1
-Host: localhost
+Thu 2024-05-30 01:13:22 - Response status: success, stderr: , stdout: Hello, Rust!
+
+
+Thu 2024-05-30 01:13:24 - Request from client: POST /api/run HTTP/1.1
 Content-Type: application/json
-Content-Length: 400
+User-Agent: PostmanRuntime/7.39.0
+Accept: */*
+Cache-Control: no-cache
+Postman-Token: 5f95f137-9c53-4201-a7a8-2543191a0995
+Host: localhost:6969
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 147
 
 {
-	"language":	"PYTHON",
-	"code":	"def is_prime(n):\n    if n <= 1:\n        return False\n    for i in range(2, n):\n        if n % i == 0:\n            return False\n    return True\n\ncount = 0\nnum = 2\nprime_numbers = []\n\nwhile count < 4:\n    if is_prime(num):\n        prime_numbers.append(num)\n        count += 1\n    num += 1\n\nprint(\"The first 4 prime numbers are:\", prime_numbers)"
+    "language": "C",
+    "code": "#include <stdio.h>\nint main() {\n    printf(\"Hello C\");\n    return 0;\n}",
+    "killAfterResponse": 1
 }
 
-Thu 2024-05-30 00:26:20 - Response python status: success
+Thu 2024-05-30 01:13:24 - Response status: success
 
-Thu 2024-05-30 00:26:25 - Client closed the connection
+Thu 2024-05-30 01:13:24 - Response status: success, stderr: , stdout: Hello C
 
-Thu 2024-05-30 00:26:25 - Request from client: 
+Thu 2024-05-30 01:13:28 - Request from client: POST /api/run HTTP/1.1
+Content-Type: application/json
+User-Agent: PostmanRuntime/7.39.0
+Accept: */*
+Cache-Control: no-cache
+Postman-Token: a64c34c3-21df-450c-b64a-5dd9976fe6c7
+Host: localhost:6969
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 121
+
+{
+    "language": "RUST",
+    "code": "fn main() {\n println!(\"Hello, Rust!\");\n }\n",
+    "killAfterResponse": 1
+}
+
+Thu 2024-05-30 01:13:28 - Response status: success, stderr: , stdout: 
+
+Thu 2024-05-30 01:13:28 - Response status: success, stderr: , stdout: Hello, Rust!
+
+
+Thu 2024-05-30 01:13:31 - Request from client: POST /api/run HTTP/1.1
+Content-Type: application/json
+User-Agent: PostmanRuntime/7.39.0
+Accept: */*
+Cache-Control: no-cache
+Postman-Token: 12bd406b-4eac-4f0f-9a48-ae38471aea0e
+Host: localhost:6969
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 147
+
+{
+    "language": "C",
+    "code": "#include <stdio.h>\nint main() {\n    printf(\"Hello C\");\n    return 0;\n}",
+    "killAfterResponse": 1
+}
+
+Thu 2024-05-30 01:13:31 - Response status: success
+
+Thu 2024-05-30 01:13:31 - Response status: success, stderr: , stdout: Hello C
 

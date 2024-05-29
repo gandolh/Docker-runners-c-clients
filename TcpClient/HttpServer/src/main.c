@@ -14,6 +14,10 @@
 #include "Code_Run_Lib.h"
 #include "Logger.h"
 #include "cJSON.h"
+#include "thpool.h"
+#include <pthread.h>
+#include <stdint.h>
+#include "thpool.h"
 
 #define CLIENT_BUFFER_SIZE 4096
 #define RESPONSE_DATA_BUFFER_SIZE 4096
@@ -143,7 +147,7 @@ void MatchRoute(struct Route *route, char *urlRoute, char *body_start, char *res
 	render_static_file("templates/404.html", response_data, RESPONSE_DATA_BUFFER_SIZE);
 }
 
-void *handle_client(void *arg)
+void handle_client(void *arg)
 {
 	HandleClientArgs *handleClientArgs = (HandleClientArgs *)arg;
 	// request got from client
@@ -153,14 +157,12 @@ void *handle_client(void *arg)
 	// response data with header
 	char *response = malloc(RESPONSE_BUFFER_SIZE);
 	// start listening to client
-	int retryCount = 10;
 
 	while (1)
 	{
 		memset(client_msg, 0, CLIENT_BUFFER_SIZE);
 		memset(response_data, 0, RESPONSE_DATA_BUFFER_SIZE);
 		memset(response, 0, RESPONSE_BUFFER_SIZE);
-
 		ssize_t recv_size = recv(*handleClientArgs->client_socket, client_msg, CLIENT_BUFFER_SIZE, 0);
 		if (recv_size < 0)
 		{
@@ -169,9 +171,7 @@ void *handle_client(void *arg)
 		else if (recv_size == 0)
 		{
 			write_log("Client closed the connection\n");
-			retryCount--;
-			if (retryCount <= 0)
-				break;
+			break;
 		}
 
 		write_log("Request from client: %s\n", client_msg);
@@ -213,6 +213,31 @@ void *handle_client(void *arg)
 			close(*handleClientArgs->client_socket);
 			break;
 		}
+
+		if (body_start != NULL)
+		{
+			int killAfterResponse = 0;
+			cJSON *json = cJSON_Parse(body_start);
+			if (json == NULL)
+			{
+				const char *error_ptr = cJSON_GetErrorPtr();
+				if (error_ptr != NULL)
+				{
+					write_log("Error before: %s\n", error_ptr);
+				}
+				return;
+			}
+
+			cJSON *killAfterResponse_item = cJSON_GetObjectItemCaseSensitive(json, "killAfterResponse");
+			if (cJSON_IsNumber(killAfterResponse_item))
+			{
+				killAfterResponse = killAfterResponse_item->valueint;
+			}
+			cJSON_Delete(json);
+
+			if (killAfterResponse == 1)
+				break;
+		}
 	}
 	close(*handleClientArgs->client_socket);
 	free(response_data);
@@ -229,6 +254,8 @@ int main()
 
 	HTTP_Server http_server;
 	struct Route *route;
+	threadpool thpool = thpool_init(12);
+
 	// initiate HTTP_Server
 	init_server(&http_server, PORT);
 	// registering Routes
@@ -249,8 +276,10 @@ int main()
 		HandleClientArgs handleClientArgs;
 		handleClientArgs.client_socket = &client_socket;
 		handleClientArgs.route = route;
-		handle_client(&handleClientArgs);
+		thpool_add_work(thpool, handle_client, (void *)(&handleClientArgs));
+		// handle_client(&handleClientArgs);
 	}
 
+	thpool_destroy(thpool);
 	return 0;
 }

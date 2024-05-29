@@ -62,7 +62,6 @@ void create_log_file()
 char *generate_json_resp(const char *status, const char *filename, const char *stdout, const char *stderr)
 {
     cJSON *root = cJSON_CreateObject();
-
     cJSON_AddStringToObject(root, "status", status);
     cJSON_AddStringToObject(root, "filename", filename);
     cJSON_AddStringToObject(root, "stdout", stdout);
@@ -177,6 +176,9 @@ char *RunCompiled(const char *exec_path)
         close(stderr_pipe[1]); // Close the write end of the stderr pipe in the parent
 
         char stdout_buffer[4096], stderr_buffer[4096];
+        // clear buffers
+        memset(stdout_buffer, 0, sizeof(stdout_buffer));
+        memset(stderr_buffer, 0, sizeof(stderr_buffer));
         read(stdout_pipe[0], stdout_buffer, sizeof(stdout_buffer));
         read(stderr_pipe[0], stderr_buffer, sizeof(stderr_buffer));
 
