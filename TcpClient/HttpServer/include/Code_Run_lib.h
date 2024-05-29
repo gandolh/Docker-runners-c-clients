@@ -26,6 +26,18 @@ typedef struct CodeRunnerRunRequest
     char *language;
 } CodeRunnerRunRequest;
 
+typedef struct ServerRequest
+{
+    char *language;
+    char *code;
+} ServerRequest;
+
+typedef struct ServerResponse
+{
+    char *stdout;
+    char *stderr;
+} ServerResponse;
+
 int codeRunLib_RunDemo();
 void InitContainersThreadpool();
 CodeRunnerResponse *CompileCCode(char *const code);

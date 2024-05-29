@@ -1,0 +1,82 @@
+Wed 2024-05-29 21:32:57 - Log file created
+Wed 2024-05-29 21:33:00 - bind socket to port 6969
+Wed 2024-05-29 21:33:00 - Listening on port 6969
+Wed 2024-05-29 21:33:00 - HTTP Server Initialized
+Port: 6969
+
+Wed 2024-05-29 21:33:03 - Request from client: POST /api/run HTTP/1.1
+Content-Type: application/json
+User-Agent: PostmanRuntime/7.39.0
+Accept: */*
+Cache-Control: no-cache
+Postman-Token: 1e864031-06a3-4502-b322-b0575bd34267
+Host: localhost:6969
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 93
+
+{
+    "language": "RUST",
+    "code": "fn main() {\n println!(\"Hello, world!\");\n }\n"
+}
+
+Wed 2024-05-29 21:33:04 - Response status: success, stderr: 
+
+Wed 2024-05-29 21:33:04 - Response status: success, stderr: 
+
+Wed 2024-05-29 21:33:18 - Request from client: POST /api/run HTTP/1.1
+Content-Type: application/json
+User-Agent: PostmanRuntime/7.39.0
+Accept: */*
+Cache-Control: no-cache
+Postman-Token: 25a8cc5a-a211-4bea-a64b-1b7b800e7f0a
+Host: localhost:6969
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 93
+
+{
+    "language": "RUST",
+    "code": "fn main() {\n println!(\"Hello, world!\");\n }\n"
+}
+
+Wed 2024-05-29 21:33:18 - Response status: success, stderr: 
+
+Wed 2024-05-29 21:33:18 - Response status: success, stderr: 
+
+Wed 2024-05-29 21:34:04 - Request from client: POST /api/run HTTP/1.1
+Content-Type: application/json
+User-Agent: PostmanRuntime/7.39.0
+Accept: */*
+Cache-Control: no-cache
+Postman-Token: 9473223e-f305-47e0-abbb-c607c11b2e4c
+Host: localhost:6969
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 69
+
+{
+    "language": "PYTHON",
+    "code": "print(\"Hello World\")"
+}
+
+Wed 2024-05-29 21:34:04 - Response python status: success
+
+Wed 2024-05-29 21:34:13 - Request from client: POST /api/run HTTP/1.1
+Content-Type: application/json
+User-Agent: PostmanRuntime/7.39.0
+Accept: */*
+Cache-Control: no-cache
+Postman-Token: 06ee22c4-09fd-41a0-8d03-738f373721b3
+Host: localhost:6969
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 70
+
+{
+    "language": "PYTHON",
+    "code": "print(\"Hello World2\")"
+}
+
+Wed 2024-05-29 21:34:13 - Response python status: success
+
