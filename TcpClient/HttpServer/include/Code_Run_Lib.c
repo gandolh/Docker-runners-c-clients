@@ -233,7 +233,7 @@ CodeRunnerResponse *CompileCCode(char *const code)
 
 void WriteResponseToLog(CodeRunnerResponse *resp)
 {
-    write_log("Response status: %s, stderr: %s\n", resp->status, resp->stderr);
+    write_log("Response status: %s, stderr: %s, stdout: %s\n", resp->status, resp->stderr, resp->stdout);
 }
 
 CodeRunnerResponse *CompileRustCode(char *const code)

@@ -9,6 +9,8 @@
         "unistd.h": "c",
         "stdio.h": "c",
         "logger.h": "c",
-        "cjson.h": "c"
+        "cjson.h": "c",
+        "code_run_lib.h": "c",
+        "errno.h": "c"
     }
 }

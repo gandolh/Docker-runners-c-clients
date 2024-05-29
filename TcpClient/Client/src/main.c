@@ -8,6 +8,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include "cJSON.h"
+#include "Logger.h"
+#include <unistd.h>
+
+#define PORT 6969
+#define CLIENT_BUFFER_SIZE 4096
+#define RESPONSE_DATA_BUFFER_SIZE 4096
+#define HEADER_BUFFER_SIZE 20
+#define RESPONSE_BUFFER_SIZE RESPONSE_DATA_BUFFER_SIZE + HEADER_BUFFER_SIZE
 
 typedef struct ServerRequest
 {
@@ -39,9 +51,9 @@ const char *getLanguageFromInput(int input)
     switch (input)
     {
     case 1:
-        return "Python";
+        return "PYTHON";
     case 2:
-        return "Rust";
+        return "RUST";
     case 3:
         return "C";
     default:
@@ -54,6 +66,24 @@ int main()
     char inputBuffer[10];
     char code[256];
     char fileOption[10];
+
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0)
+    {
+        perror("Cannot create socket");
+        return 1;
+    }
+
+    struct sockaddr_in server_address;
+    server_address.sin_family = AF_INET;
+    server_address.sin_port = htons(PORT);
+    server_address.sin_addr.s_addr = INADDR_ANY;
+
+    if (connect(sockfd, (struct sockaddr *)&server_address, sizeof(server_address)) < 0)
+    {
+        perror("Cannot connect to server");
+        return 1;
+    }
 
     while (1)
     {
@@ -104,7 +134,45 @@ int main()
         }
 
         // Here you can add the code to actually send the request to the server
+        write_log("Sending request to server");
 
+        // Convert ServerRequest to cJSON
+        cJSON *request_json = cJSON_CreateObject();
+        cJSON_AddStringToObject(request_json, "language", request.language);
+        cJSON_AddStringToObject(request_json, "code", request.code);
+
+        // Print the JSON
+        char *json_string = cJSON_Print(request_json);
+
+        // Create the HTTP request
+        char *http_request = malloc(strlen("POST /api/run HTTP/1.1\r\n"
+                                           "Host: localhost\r\n"
+                                           "Content-Type: application/json\r\n"
+                                           "Content-Length: ") +
+                                    strlen(json_string) +
+                                    strlen("\r\n\r\n") +
+                                    strlen(json_string) +
+                                    1);
+        sprintf(http_request, "POST /api/run HTTP/1.1\r\n"
+                              "Host: localhost\r\n"
+                              "Content-Type: application/json\r\n"
+                              "Content-Length: %zu\r\n\r\n"
+                              "%s",
+                strlen(json_string), json_string);
+
+        // Send the HTTP request
+        write(sockfd, http_request, strlen(http_request));
+        char buffer[RESPONSE_BUFFER_SIZE];
+        memset(buffer, 0, RESPONSE_BUFFER_SIZE);
+        read(sockfd, buffer, RESPONSE_BUFFER_SIZE - 1);
+
+        // Write the response to the logs
+        write_log("Response from server: %s", buffer);
+
+        // Free the cJSON object and the strings
+        cJSON_Delete(request_json);
+        free(json_string);
+        free(http_request);
         freeRequest(&request);
     }
 
