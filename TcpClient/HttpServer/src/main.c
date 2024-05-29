@@ -12,8 +12,8 @@
 #include "Routes.h"
 #include "Response.h"
 #include "Code_Run_Lib.h"
-#include "REST_Api_Handler.h"
 #include "Logger.h"
+#include "cJSON.h"
 
 #define CLIENT_BUFFER_SIZE 4096
 #define RESPONSE_DATA_BUFFER_SIZE 4096
@@ -21,7 +21,87 @@
 #define RESPONSE_BUFFER_SIZE RESPONSE_DATA_BUFFER_SIZE + HEADER_BUFFER_SIZE
 #define PORT 6969
 
-void MatchRoute(struct Route *route, char *urlRoute, char *response_data)
+void run_code(char *json_string, char *response_data, int readSize)
+{
+	// write_log("json string: %s\n", json_string);
+	ServerRequest req;
+	cJSON *server_req_json = cJSON_Parse(json_string);
+	if (server_req_json == NULL)
+	{
+		const char *error_ptr = cJSON_GetErrorPtr();
+		if (error_ptr != NULL)
+		{
+			write_log("Error before: %s\n", error_ptr);
+		}
+		return;
+	}
+
+	cJSON *language = cJSON_GetObjectItemCaseSensitive(server_req_json, "language");
+	cJSON *code = cJSON_GetObjectItemCaseSensitive(server_req_json, "code");
+
+	if (cJSON_IsString(language) && language->valuestring != NULL && cJSON_IsString(code) && code->valuestring != NULL)
+	{
+		req.language = language->valuestring;
+		req.code = code->valuestring;
+	}
+
+	CodeRunnerResponse *codeRunResp = NULL;
+	ServerResponse server_resp;
+
+	if (strcmp(req.language, "C") == 0)
+	{
+		// write_log("Running the C code: %s\n", req.code);
+		CodeRunnerResponse *resp = CompileCCode(req.code);
+		if (resp == NULL)
+		{
+			write_log("Error: compiling C code\n");
+			return;
+		}
+		codeRunResp = RunCCode(resp->filename);
+		free(resp);
+	}
+	else if (strcmp(req.language, "RUST") == 0)
+	{
+		CodeRunnerResponse *resp = CompileRustCode(req.code);
+		if (resp == NULL)
+		{
+			write_log("Error: compiling Rust code\n");
+			return;
+		}
+		codeRunResp = RunRustCode(resp->filename);
+		free(resp);
+	}
+	else if (strcmp(req.language, "PYTHON") == 0)
+	{
+		codeRunResp = RunPythonCode(req.code);
+	}
+	else
+	{
+		write_log("Error: language not supported\n");
+		return;
+	}
+
+	server_resp.stdout = codeRunResp->stdout;
+	server_resp.stderr = codeRunResp->stderr;
+
+	cJSON *server_resp_json = cJSON_CreateObject();
+
+	cJSON_AddStringToObject(server_resp_json, "stdout", server_resp.stdout);
+	cJSON_AddStringToObject(server_resp_json, "stderr", server_resp.stderr);
+
+	char *server_resp_json_string = cJSON_Print(server_resp_json);
+	if (server_resp_json_string == NULL)
+	{
+		write_log("ERROR: Failed to print server_resp_json_string.");
+	}
+
+	snprintf(response_data, readSize, "%s", server_resp_json_string);
+	cJSON_Delete(server_req_json);
+	cJSON_Delete(server_resp_json);
+	free(codeRunResp);
+}
+
+void MatchRoute(struct Route *route, char *urlRoute, char *body_start, char *response_data)
 {
 	struct Route *matchedRoute = search(route, urlRoute);
 
@@ -31,7 +111,7 @@ void MatchRoute(struct Route *route, char *urlRoute, char *response_data)
 	{
 		strcat(templatePath, matchedRoute->value);
 		render_static_file(templatePath, response_data, RESPONSE_DATA_BUFFER_SIZE);
-		write_log("response_data: %s\n", response_data);
+		// write_log("response_data: %s\n", response_data);
 		return;
 	}
 
@@ -45,15 +125,10 @@ void MatchRoute(struct Route *route, char *urlRoute, char *response_data)
 	// Rest API endpoints
 	if (strstr(urlRoute, "/api/") != NULL)
 	{
-		if (strstr(urlRoute, "/api/compile") != NULL)
+
+		if (strstr(urlRoute, "/run") != NULL)
 		{
-			// TODO: call api handler
-			printf("Compiling code\n");
-		}
-		else if (strstr(urlRoute, "/api/run") != NULL)
-		{
-			// TODO: call API handler
-			printf("Running code\n");
+			run_code(body_start, response_data, RESPONSE_DATA_BUFFER_SIZE);
 		}
 
 		return;
@@ -101,40 +176,34 @@ int main()
 
 		client_socket = accept(http_server.socket, NULL, NULL);
 		read(client_socket, client_msg, CLIENT_BUFFER_SIZE - 1);
-
+		write_log("Request from client: %s\n", client_msg);
 		// parsing client socket header to get HTTP method, route
 		char *method = "";
 		char *urlRoute = "";
+		char *body_start = strstr(client_msg, "\r\n\r\n");
+
+		if (body_start == NULL)
+			body_start = strstr(client_msg, "\n\n");
+
+		if (body_start != NULL)
+			body_start += (body_start[1] == '\n') ? 2 : 4;
 
 		char *client_http_header = strtok(client_msg, "\n");
 
 		printf("\n\n%s\n\n", client_http_header);
 
 		char *header_token = strtok(client_http_header, " ");
+		method = header_token;
+		header_token = strtok(NULL, " ");
+		urlRoute = header_token;
 
-		int header_parse_counter = 0;
-
-		while (header_token != NULL)
-		{
-
-			switch (header_parse_counter)
-			{
-			case 0:
-				method = header_token;
-				break;
-			case 1:
-				urlRoute = header_token;
-				break;
-			}
-			header_token = strtok(NULL, " ");
-			header_parse_counter++;
-		}
-
+		// if (body_start != NULL)
+		// 	write_log("Body start: %s\n", body_start);
 		printf("The method is %s\n", method);
 		printf("The route is %s\n", urlRoute);
 
 		// match route
-		MatchRoute(route, urlRoute, response_data);
+		MatchRoute(route, urlRoute, body_start, response_data);
 		// compose response
 		char http_header[HEADER_BUFFER_SIZE] = "HTTP/1.1 200 OK\r\n\r\n";
 		snprintf(response, RESPONSE_BUFFER_SIZE, "%s%s", http_header, response_data);
