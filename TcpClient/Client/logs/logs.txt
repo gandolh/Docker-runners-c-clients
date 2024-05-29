@@ -1,0 +1,14 @@
+Thu 2024-05-30 00:26:11 - Sending request to server
+Thu 2024-05-30 00:26:11 - Response from server: HTTP/1.1 200 OK
+
+{
+	"stdout":	"The first 4 prime numbers are: [2, 3, 5, 7]\n",
+	"stderr":	""
+}
+Thu 2024-05-30 00:26:20 - Sending request to server
+Thu 2024-05-30 00:26:20 - Response from server: HTTP/1.1 200 OK
+
+{
+	"stdout":	"The first 4 prime numbers are: [2, 3, 5, 7]\n",
+	"stderr":	""
+}

@@ -87,6 +87,10 @@ int main()
 
     while (1)
     {
+        // empty inputBuffer, code and fileOption
+        memset(inputBuffer, 0, sizeof(inputBuffer));
+        memset(code, 0, sizeof(code));
+        memset(fileOption, 0, sizeof(fileOption));
         promptForInput(inputBuffer, sizeof(inputBuffer), "Enter language (1 for Python, 2 for Rust, 3 for C, or '0' to quit): ");
         int languageOption = atoi(inputBuffer);
         if (languageOption == 0)
@@ -161,10 +165,28 @@ int main()
                 strlen(json_string), json_string);
 
         // Send the HTTP request
-        write(sockfd, http_request, strlen(http_request));
+        ssize_t sent_size = send(sockfd, http_request, CLIENT_BUFFER_SIZE, 0);
+        if (sent_size < 0)
+        {
+            write_log("ERROR: send failed");
+            return -1;
+        }
+
         char buffer[RESPONSE_BUFFER_SIZE];
         memset(buffer, 0, RESPONSE_BUFFER_SIZE);
-        read(sockfd, buffer, RESPONSE_BUFFER_SIZE - 1);
+
+        ssize_t recv_size = recv(sockfd, buffer, RESPONSE_BUFFER_SIZE, 0);
+        if (recv_size < 0)
+        {
+            perror("ERROR: recv failed");
+            write_log("ERROR: recv failed");
+            return -1;
+        }
+        else if (recv_size == 0)
+        {
+            write_log("Server closed the connection\n");
+            return 0;
+        }
 
         // Write the response to the logs
         write_log("Response from server: %s", buffer);

@@ -1,10 +1,10 @@
-Wed 2024-05-29 22:22:55 - Log file created
-Wed 2024-05-29 22:22:59 - bind socket to port 6969
-Wed 2024-05-29 22:22:59 - Listening on port 6969
-Wed 2024-05-29 22:22:59 - HTTP Server Initialized
+Thu 2024-05-30 00:25:35 - Log file created
+Thu 2024-05-30 00:25:39 - bind socket to port 6969
+Thu 2024-05-30 00:25:40 - Listening on port 6969
+Thu 2024-05-30 00:25:40 - HTTP Server Initialized
 Port: 6969
 
-Wed 2024-05-29 22:23:07 - Request from client: POST /api/run HTTP/1.1
+Thu 2024-05-30 00:26:11 - Request from client: POST /api/run HTTP/1.1
 Host: localhost
 Content-Type: application/json
 Content-Length: 400
@@ -14,5 +14,21 @@ Content-Length: 400
 	"code":	"def is_prime(n):\n    if n <= 1:\n        return False\n    for i in range(2, n):\n        if n % i == 0:\n            return False\n    return True\n\ncount = 0\nnum = 2\nprime_numbers = []\n\nwhile count < 4:\n    if is_prime(num):\n        prime_numbers.append(num)\n        count += 1\n    num += 1\n\nprint(\"The first 4 prime numbers are:\", prime_numbers)"
 }
 
-Wed 2024-05-29 22:23:07 - Response python status: success
+Thu 2024-05-30 00:26:11 - Response python status: success
+
+Thu 2024-05-30 00:26:20 - Request from client: POST /api/run HTTP/1.1
+Host: localhost
+Content-Type: application/json
+Content-Length: 400
+
+{
+	"language":	"PYTHON",
+	"code":	"def is_prime(n):\n    if n <= 1:\n        return False\n    for i in range(2, n):\n        if n % i == 0:\n            return False\n    return True\n\ncount = 0\nnum = 2\nprime_numbers = []\n\nwhile count < 4:\n    if is_prime(num):\n        prime_numbers.append(num)\n        count += 1\n    num += 1\n\nprint(\"The first 4 prime numbers are:\", prime_numbers)"
+}
+
+Thu 2024-05-30 00:26:20 - Response python status: success
+
+Thu 2024-05-30 00:26:25 - Client closed the connection
+
+Thu 2024-05-30 00:26:25 - Request from client: 
 

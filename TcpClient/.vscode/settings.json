@@ -11,6 +11,7 @@
         "logger.h": "c",
         "cjson.h": "c",
         "code_run_lib.h": "c",
-        "errno.h": "c"
+        "errno.h": "c",
+        "response.h": "c"
     }
 }
