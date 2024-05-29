@@ -231,6 +231,11 @@ CodeRunnerResponse *CompileCCode(char *const code)
     return resp;
 }
 
+void WriteResponseToLog(CodeRunnerResponse *resp)
+{
+    write_log("Response status: %s, stderr: %s\n", resp->status, resp->stderr);
+}
+
 CodeRunnerResponse *CompileRustCode(char *const code)
 {
     CodeRunnerCompileRequest req;
@@ -243,7 +248,7 @@ CodeRunnerResponse *CompileRustCode(char *const code)
     CodeRunnerResponse *resp = deserializeCodeRunnerResponse(response);
     free(response);
     free(json);
-    write_log("Response status: %s\n", resp->status);
+    WriteResponseToLog(resp);
     return resp;
 }
 
@@ -259,7 +264,7 @@ CodeRunnerResponse *RunCCode(char *const filename)
     CodeRunnerResponse *resp = deserializeCodeRunnerResponse(response);
     free(response);
     free(json);
-    write_log("Response status: %s\n", resp->status);
+    WriteResponseToLog(resp);
     return resp;
 }
 
@@ -276,7 +281,7 @@ CodeRunnerResponse *RunRustCode(char *const filename)
     CodeRunnerResponse *resp = deserializeCodeRunnerResponse(response);
     free(response);
     free(json);
-    write_log("Response status: %s\n", resp->status);
+    WriteResponseToLog(resp);
     return resp;
 }
 
