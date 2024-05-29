@@ -1,10 +1,13 @@
 /**
- * TODO:
- * Este doar un tip de comanda, si anume RUN. Se pune totul in ServerRequest.
- *  language e cu alege 1 2 sau 3 si pune in struct (1 = C  2 = RUST sau 3 = PYTHON).
- * la cod sa aleaga daca zice locatia unui fisier (si atunci citeste de acolo codul si il pune in struct) sau scrie de mana codul in terminal
- * sa printeze struct-ul sa vedem ca e totul ok
+ * Examples of files to run:
+ * - C: examples/example.c
+ * - Rust: examples/example.rs
+ * - Python: examples/example.py
  */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct ServerRequest
 {
@@ -12,55 +15,97 @@ typedef struct ServerRequest
     char *code;
 } ServerRequest;
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#define CLIENT_BUFFER_SIZE 4096
-#define SERVER_BUFFER_SIZE 4096 + 20
-#define PORT 6969
-#define MAX_CONSOLE_COMMAND_SIZE 50
-
-int main(int argc, char *argv[])
+void initializeRequest(ServerRequest *request, const char *language, const char *code)
 {
+    request->language = strdup(language);
+    request->code = strdup(code);
+}
 
-    // Create a socket
-    int server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_socket < 0)
+void freeRequest(ServerRequest *request)
+{
+    free(request->language);
+    free(request->code);
+}
+
+void promptForInput(char *buffer, size_t size, const char *prompt)
+{
+    printf("%s", prompt);
+    fgets(buffer, size, stdin);
+    buffer[strcspn(buffer, "\n")] = 0; // Remove newline character
+}
+
+const char *getLanguageFromInput(int input)
+{
+    switch (input)
     {
-        perror("Failed to create socket");
-        exit(EXIT_FAILURE);
+    case 1:
+        return "Python";
+    case 2:
+        return "Rust";
+    case 3:
+        return "C";
+    default:
+        return NULL;
     }
+}
 
-    // Specify server details
+int main()
+{
+    char inputBuffer[10];
+    char code[256];
+    char fileOption[10];
 
-    struct sockaddr_in server_address;
-    server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(PORT);
-    server_address.sin_addr.s_addr = INADDR_ANY;
-
-    // Connect to the server
-    if (connect(server_socket, (struct sockaddr *)&server_address, sizeof(server_address)) < 0)
-    {
-        perror("Failed to connect to server");
-        exit(EXIT_FAILURE);
-    }
-
-    printf("PRESS -h for help\n");
     while (1)
     {
-        char str[MAX_CONSOLE_COMMAND_SIZE];
-        fgets(str, MAX_CONSOLE_COMMAND_SIZE, stdin);
-        // remove endline
-        str[strlen(str) - 1] = '\0';
-        printf("You entered: %s\n", str);
+        promptForInput(inputBuffer, sizeof(inputBuffer), "Enter language (1 for Python, 2 for Rust, 3 for C, or '0' to quit): ");
+        int languageOption = atoi(inputBuffer);
+        if (languageOption == 0)
+        {
+            break;
+        }
+
+        const char *language = getLanguageFromInput(languageOption);
+        if (language == NULL)
+        {
+            printf("Invalid option. Please try again.\n");
+            continue;
+        }
+
+        promptForInput(code, sizeof(code), "Enter code or filename: ");
+        promptForInput(fileOption, sizeof(fileOption), "Is it a file? (yes/no): ");
+
+        int isFile = strcmp(fileOption, "yes") == 0;
+
+        ServerRequest request;
+        if (isFile)
+        {
+            FILE *file = fopen(code, "r");
+            if (!file)
+            {
+                perror("Failed to open file");
+                continue;
+            }
+            fseek(file, 0, SEEK_END);
+            long length = ftell(file);
+            fseek(file, 0, SEEK_SET);
+            char *buffer = malloc(length + 1);
+            if (buffer)
+            {
+                fread(buffer, 1, length, file);
+                buffer[length] = '\0';
+            }
+            fclose(file);
+            initializeRequest(&request, language, buffer);
+            free(buffer);
+        }
+        else
+        {
+            initializeRequest(&request, language, code);
+        }
+
+                // Here you can add the code to actually send the request to the server
+
+        freeRequest(&request);
     }
 
     return 0;
