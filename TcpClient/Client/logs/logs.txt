@@ -1,21 +1,7 @@
-Thu 2024-05-30 20:53:28 - Sending request to server
-Thu 2024-05-30 20:53:28 - Response from server: HTTP/1.1 200 OK
+Fri 2024-05-31 00:05:27 - Sending request to server
+Fri 2024-05-31 00:05:27 - Response from server: HTTP/1.1 200 OK
 
 {
 	"stdout":	"The first 4 prime numbers are: [2, 3, 5, 7]\n",
-	"stderr":	""
-}
-Thu 2024-05-30 20:53:53 - Sending request to server
-Thu 2024-05-30 20:53:53 - Response from server: HTTP/1.1 200 OK
-
-{
-	"stdout":	"",
-	"stderr":	""
-}
-Thu 2024-05-30 20:54:14 - Sending request to server
-Thu 2024-05-30 20:54:14 - Response from server: HTTP/1.1 200 OK
-
-{
-	"stdout":	"The 4th Fibonacci number is: 3\n",
 	"stderr":	""
 }

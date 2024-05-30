@@ -50,7 +50,7 @@ void initialSeed()
         write_log("Table User created successfully\n");
     }
 
-    char *sql_insert = "INSERT INTO User (Username, Password, LastActiveTime, IsActive) VALUES ('Horia', '1234', '', 0), ('Cristian', '4321', '', 0), ('Thomas', '5678', '', 0);";
+    char *sql_insert = "INSERT INTO User (Username, Password, LastActiveTime, IsActive) VALUES ('Horia', '1234', '', 0), ('Cristian', '4321', '', 0), ('Thomas', '5678', '', 0), ('admin', 'admin', '', 0);";
 
     rc = sqlite3_exec(db, sql_insert, 0, 0, &err_msg);
 
@@ -75,7 +75,7 @@ int handleLogin(const char *username, const char *password)
     int rc;
 
     snprintf(sql, sizeof(sql), "SELECT * FROM User WHERE username='%s' AND password='%s'", username, password);
-    printf("SQL: %s\n", sql);
+    write_log("SQL: %s\n", sql);
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
     {

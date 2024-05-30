@@ -61,6 +61,98 @@ const char *getLanguageFromInput(int input)
     }
 }
 
+// return 0 if success, -1 if failed
+int handleServerLogin(int *sockfd)
+{
+
+    char username[256];
+    char password[256];
+
+    printf("Enter username: ");
+    fgets(username, sizeof(username), stdin);
+    username[strcspn(username, "\n")] = 0; // Remove trailing newline
+
+    printf("Enter password: ");
+    fgets(password, sizeof(password), stdin);
+    password[strcspn(password, "\n")] = 0;
+
+    cJSON *login_json = cJSON_CreateObject();
+    cJSON_AddStringToObject(login_json, "username", username);
+    cJSON_AddStringToObject(login_json, "password", password);
+
+    char *login_json_string = cJSON_Print(login_json);
+    char *http_login_request = malloc(strlen("POST /api/login HTTP/1.1\r\n"
+                                             "Host: localhost\r\n"
+                                             "Content-Type: application/json\r\n"
+                                             "Content-Length: ") +
+                                      strlen(login_json_string) +
+                                      strlen("\r\n\r\n") +
+                                      strlen(login_json_string) +
+                                      1);
+    sprintf(http_login_request, "POST /api/login HTTP/1.1\r\n"
+                                "Host: localhost\r\n"
+                                "Content-Type: application/json\r\n"
+                                "Content-Length: %zu\r\n\r\n"
+                                "%s",
+            strlen(login_json_string), login_json_string);
+
+    // Send the HTTP request for login
+    ssize_t sent_login_size = send(*sockfd, http_login_request, CLIENT_BUFFER_SIZE, 0);
+    if (sent_login_size < 0)
+    {
+        write_log("ERROR: send failed");
+        return -1;
+    }
+
+    char response[CLIENT_BUFFER_SIZE];
+    memset(response, 0, sizeof(response));
+
+    ssize_t received_size = recv(*sockfd, response, CLIENT_BUFFER_SIZE - 1, 0);
+    if (received_size < 0)
+    {
+        write_log("ERROR: recv failed");
+        return -1;
+    }
+
+    char *header_end = strstr(response, "\r\n\r\n");
+    if (header_end == NULL)
+    {
+        write_log("ERROR: Response does not contain a valid HTTP header");
+        return -1;
+    }
+
+    char *body = header_end + 4; // Skip past the "\r\n\r\n"
+
+    cJSON *json_response = cJSON_Parse(body);
+    if (json_response == NULL)
+    {
+        write_log("ERROR: Failed to parse JSON response");
+        return -1;
+    }
+
+    cJSON *status_json = cJSON_GetObjectItemCaseSensitive(json_response, "status");
+    if (cJSON_IsString(status_json) && status_json->valuestring != NULL)
+    {
+        if (strcmp(status_json->valuestring, "success") == 0)
+        {
+            printf("Login successful\n");
+        }
+        else if (strcmp(status_json->valuestring, "failed") == 0)
+        {
+            printf("Login failed\n");
+            exit(-1);
+        }
+        else
+        {
+            printf("Unknown status: %s\n", status_json->valuestring);
+        }
+    }
+
+    cJSON_Delete(json_response);
+    free(login_json_string);
+    free(http_login_request);
+}
+
 int main()
 {
     char inputBuffer[10];
@@ -84,6 +176,8 @@ int main()
         perror("Cannot connect to server");
         return 1;
     }
+
+    handleServerLogin(&sockfd);
 
     while (1)
     {

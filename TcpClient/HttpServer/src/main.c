@@ -112,6 +112,47 @@ void run_code(char *json_string, char *response_data, int readSize)
 	free(codeRunResp);
 }
 
+void on_handleLogin(char *json_string, char *response_data)
+{
+	cJSON *json_data = cJSON_Parse(json_string);
+	if (json_data == NULL)
+	{
+		printf("Error parsing JSON\n");
+		return;
+	}
+
+	cJSON *username_json = cJSON_GetObjectItemCaseSensitive(json_data, "username");
+	cJSON *password_json = cJSON_GetObjectItemCaseSensitive(json_data, "password");
+
+	if (!cJSON_IsString(username_json) || !cJSON_IsString(password_json))
+	{
+		printf("Error: username or password is not a string\n");
+		cJSON_Delete(json_data);
+		return;
+	}
+
+	char *username = username_json->valuestring;
+	char *password = password_json->valuestring;
+
+	// Now you have the username and password, you can use them as needed
+	int login_status = handleLogin(username, password);
+
+	cJSON *response_json = cJSON_CreateObject();
+	cJSON_AddStringToObject(response_json, "status", (login_status == 1 ? "success" : "failed"));
+	char *response_string = cJSON_Print(response_json);
+	if (response_string == NULL)
+	{
+		printf("Failed to print response_json.\n");
+		return;
+	}
+
+	strncpy(response_data, response_string, strlen(response_string));
+	response_data[strlen(response_string)] = '\0'; // Ensure null termination
+
+	free(response_string);
+	cJSON_Delete(json_data);
+}
+
 // 0 if keep connection, 1 if kill connection
 void SolveRouteHtmlPages(struct Route *route, char *urlRoute, int *client_socket)
 {
@@ -158,6 +199,10 @@ int SolveRouteApi(struct Route *route, char *urlRoute, char *body_start, int *cl
 	if (strstr(urlRoute, "/run") != NULL)
 	{
 		run_code(body_start, response_data, RESPONSE_DATA_BUFFER_SIZE);
+	}
+	if (strstr(urlRoute, "/login") != NULL)
+	{
+		on_handleLogin(body_start, response_data);
 	}
 	// TODO:  write in response data a json with errorCode: '404'
 
@@ -260,7 +305,7 @@ void handle_client(void *arg)
 		{
 			SolveRouteHtmlPages(handleClientArgs->route, urlRoute, handleClientArgs->client_socket);
 			// sent all html content, let's kill the connection
-			printf("got here");
+			// printf("got here");
 			break;
 		}
 	}
@@ -275,7 +320,7 @@ int main()
 	init_db();
 	// just for testing
 	// printf("\n\n====%d====\n\n", handleLogin("Horia", "1234"));
-	return 0;
+	// return 0;
 	InitContainersThreadpool();
 	// just for testing
 	// codeRunLib_RunDemo();
