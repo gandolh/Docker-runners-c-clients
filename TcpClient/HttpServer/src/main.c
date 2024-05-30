@@ -18,6 +18,7 @@
 #include <pthread.h>
 #include <stdint.h>
 #include "thpool.h"
+#include "Database.h"
 
 #define CLIENT_BUFFER_SIZE 4096
 #define RESPONSE_DATA_BUFFER_SIZE 4096
@@ -164,7 +165,8 @@ int SolveRouteApi(struct Route *route, char *urlRoute, char *body_start, int *cl
 	char http_header[HEADER_BUFFER_SIZE] = "HTTP/1.1 200 OK\r\n\r\n";
 	snprintf(response, RESPONSE_BUFFER_SIZE, "%s%s", http_header, response_data);
 	write_log("Response: %s\n", response);
-	ssize_t bytes_sent = send(*client_socket, response, RESPONSE_BUFFER_SIZE, 0);
+
+	ssize_t bytes_sent = send(*client_socket, response, strlen(response), 0);
 	if (bytes_sent == -1)
 	{
 		perror("Error sending response");
@@ -268,6 +270,12 @@ void handle_client(void *arg)
 int main()
 {
 	create_log_file();
+	// just for testing
+	// rm_db();
+	init_db();
+	// just for testing
+	// printf("\n\n====%d====\n\n", handleLogin("Horia", "1234"));
+	return 0;
 	InitContainersThreadpool();
 	// just for testing
 	// codeRunLib_RunDemo();
@@ -282,8 +290,8 @@ int main()
 	// registering Routes
 	route = initRoute("/", "index.html");
 	addRoute(&route, "/about", "about.html");
-	addRoute(&route, "/sth", "sth.html");
 	addRoute(&route, "/chicken", "chicken.html");
+	addRoute(&route, "/runner", "runner.html");
 
 	// display all available routes
 	printf("\n====================================\n");

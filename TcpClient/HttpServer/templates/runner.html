@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Submit Your Code</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			flex-direction: column;
+			height: 100vh;
+			margin: 0;
+			background-color: #f0f0f0;
+		}
+
+		h1 {
+			color: #333;
+		}
+
+		form {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		textarea {
+			padding: 10px;
+			font-size: 16px;
+			margin-bottom: 10px;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			width: 300px;
+			height: 200px;
+			resize: none;
+		}
+
+		select {
+			padding: 10px;
+			font-size: 16px;
+			margin-bottom: 10px;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			width: 200px;
+		}
+
+		button {
+			color: #fff;
+			background-color: #0066cc;
+			padding: 10px 20px;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			transition: background-color 0.3s;
+		}
+
+		button:hover {
+			background-color: #004b99;
+		}
+
+		#output {
+			margin-top: 20px;
+			padding: 10px;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			background-color: #fff;
+			width: 300px;
+			text-align: center;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>Submit Your Code</h1>
+	<form id="codeForm">
+		<textarea name="code" placeholder="Enter your code here" required></textarea>
+		<select name="language" required>
+			<option value="PYTHON">Python</option>
+			<option value="RUST">Rust</option>
+			<option value="C">C</option>
+		</select>
+		<button type="button" onclick="submitForm()">Submit</button>
+	</form>
+
+	<div id="output"></div>
+
+	<script>
+		function submitForm() {
+			const code = document.querySelector('textarea[name="code"]').value;
+			const language = document.querySelector('select[name="language"]').value;
+
+			const formData = {
+				code: code,
+				language: language,
+				killAfterResponse: 1
+			};
+
+			fetch('/api/run', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(formData)
+			})
+				.then(response => response.json())
+				.then(data => {
+					
+					displayResult(data);
+				})
+				.catch((error) => {
+					console.log('Error:', error);
+					// Handle error response
+				});
+
+			function displayResult(result) {
+				const outputDiv = document.getElementById('output');
+				outputDiv.innerHTML = `
+					<p style="color: blue;">stdout: ${result.stdout}</p>
+					<p style="color: red;">stderr: ${result.stderr}</p>
+				`;
+			}
+		}
+	</script>
+
+</body>
+
+</html>

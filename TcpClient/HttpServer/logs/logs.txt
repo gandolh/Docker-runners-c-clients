@@ -1,6 +1,5 @@
-Thu 2024-05-30 21:04:11 - Log file created
-Thu 2024-05-30 21:04:15 - bind socket to port 6969
-Thu 2024-05-30 21:04:15 - Listening on port 6969
-Thu 2024-05-30 21:04:15 - HTTP Server Initialized
-Port: 6969
+Thu 2024-05-30 23:28:36 - Log file created
+Thu 2024-05-30 23:28:36 - Successfully connected to the database.
+
+Thu 2024-05-30 23:28:36 - Successfully connected to the database.
 

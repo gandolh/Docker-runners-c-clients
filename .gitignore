@@ -60,3 +60,4 @@ TcpClient/.vscode/c_cpp_properties.json
 .vscode/c_cpp_properties.json
 TcpClient/.vscode/settings.json
 TcpClient/.vscode/settings.json
+TcpClient/HttpServer/logs/logs.txt
