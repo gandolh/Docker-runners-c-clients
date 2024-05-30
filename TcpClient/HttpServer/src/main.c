@@ -249,7 +249,11 @@ void handle_client(void *arg)
 
 		// solve route
 		if (strstr(urlRoute, "/api/") != NULL)
-			SolveRouteApi(handleClientArgs->route, urlRoute, body_start, handleClientArgs->client_socket);
+		{
+			int shouldKill = SolveRouteApi(handleClientArgs->route, urlRoute, body_start, handleClientArgs->client_socket);
+			if (shouldKill)
+				break;
+		}
 		else
 		{
 			SolveRouteHtmlPages(handleClientArgs->route, urlRoute, handleClientArgs->client_socket);
