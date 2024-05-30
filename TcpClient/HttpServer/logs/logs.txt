@@ -1,39 +1,12 @@
-Thu 2024-05-30 23:54:13 - Log file created
-Thu 2024-05-30 23:54:13 - Successfully connected to the database.
+Fri 2024-05-31 00:46:09 - Log file created
+Fri 2024-05-31 00:46:09 - Successfully connected to the database.
 
-Thu 2024-05-30 23:54:16 - bind socket to port 6969
-Thu 2024-05-30 23:54:16 - Listening on port 6969
-Thu 2024-05-30 23:54:16 - HTTP Server Initialized
+Fri 2024-05-31 00:46:13 - bind socket to port 6969
+Fri 2024-05-31 00:46:13 - Listening on port 6969
+Fri 2024-05-31 00:46:13 - HTTP Server Initialized
 Port: 6969
 
-Thu 2024-05-30 23:54:33 - Request from client: POST /api/login HTTP/1.1
-Content-Type: application/json
-User-Agent: PostmanRuntime/7.39.0
-Accept: */*
-Cache-Control: no-cache
-Postman-Token: 1488d0bf-083d-4c27-84cd-1eda1b7fdb28
-Host: localhost:6969
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Length: 77
-
-{
-  "username": "Horia",
-  "password": "1234",
-  "killAfterResponse": 1
-}
-
-Thu 2024-05-30 23:54:33 - Successfully connected to the database.
-
-Thu 2024-05-30 23:54:33 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
-
-Thu 2024-05-30 23:54:33 - Response: HTTP/1.1 200 OK
-
-{
-	"status":	"success"
-}
-
-Thu 2024-05-30 23:56:20 - Request from client: POST /api/login HTTP/1.1
+Fri 2024-05-31 00:46:31 - Request from client: POST /api/login HTTP/1.1
 Host: localhost
 Content-Type: application/json
 Content-Length: 45
@@ -43,305 +16,23 @@ Content-Length: 45
 	"password":	"1234"
 }
 
-Thu 2024-05-30 23:56:20 - Successfully connected to the database.
+Fri 2024-05-31 00:46:31 - Successfully connected to the database.
 
-Thu 2024-05-30 23:56:20 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
+Fri 2024-05-31 00:46:31 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
 
-Thu 2024-05-30 23:56:20 - Response: HTTP/1.1 200 OK
+Fri 2024-05-31 00:46:31 - Successfully connected to the database.
 
-{
-	"status":	"success"
-}
+Fri 2024-05-31 00:46:31 - SQL: UPDATE User SET LastRequestTime = datetime('now'), IsActive = 1 WHERE Username='Horia'
 
-Thu 2024-05-30 23:56:20 - Client closed the connection
+Fri 2024-05-31 00:46:31 - Record updated successfully
 
-Thu 2024-05-30 23:57:24 - Request from client: POST /api/login HTTP/1.1
-Host: localhost
-Content-Type: application/json
-Content-Length: 45
-
-{
-	"username":	"Horia",
-	"password":	"1234"
-}
-
-Thu 2024-05-30 23:57:24 - Successfully connected to the database.
-
-Thu 2024-05-30 23:57:24 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
-
-Thu 2024-05-30 23:57:24 - Response: HTTP/1.1 200 OK
+Fri 2024-05-31 00:46:31 - Response: HTTP/1.1 200 OK
 
 {
 	"status":	"success"
 }
 
-Thu 2024-05-30 23:57:24 - Client closed the connection
-
-Thu 2024-05-30 23:58:52 - Request from client: POST /api/login HTTP/1.1
-Host: localhost
-Content-Type: application/json
-Content-Length: 45
-
-{
-	"username":	"Horia",
-	"password":	"1234"
-}
-
-Thu 2024-05-30 23:58:52 - Successfully connected to the database.
-
-Thu 2024-05-30 23:58:52 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
-
-Thu 2024-05-30 23:58:52 - Response: HTTP/1.1 200 OK
-
-{
-	"status":	"success"
-}
-
-Thu 2024-05-30 23:58:52 - Client closed the connection
-
-Thu 2024-05-30 23:59:22 - Request from client: POST /api/login HTTP/1.1
-Host: localhost
-Content-Type: application/json
-Content-Length: 45
-
-{
-	"username":	"Horia",
-	"password":	"1234"
-}
-
-Thu 2024-05-30 23:59:22 - Successfully connected to the database.
-
-Thu 2024-05-30 23:59:22 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
-
-Thu 2024-05-30 23:59:23 - Response: HTTP/1.1 200 OK
-
-{
-	"status":	"success"
-}
-
-Thu 2024-05-30 23:59:23 - Client closed the connection
-
-Fri 2024-05-31 00:00:20 - Request from client: POST /api/login HTTP/1.1
-Host: localhost
-Content-Type: application/json
-Content-Length: 45
-
-{
-	"username":	"Horia",
-	"password":	"1234"
-}
-
-Fri 2024-05-31 00:00:20 - Successfully connected to the database.
-
-Fri 2024-05-31 00:00:20 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
-
-Fri 2024-05-31 00:00:20 - Response: HTTP/1.1 200 OK
-
-{
-	"status":	"success"
-}
-
-Fri 2024-05-31 00:00:20 - Client closed the connection
-
-Fri 2024-05-31 00:00:48 - Request from client: POST /api/login HTTP/1.1
-Host: localhost
-Content-Type: application/json
-Content-Length: 45
-
-{
-	"username":	"Horia",
-	"password":	"1234"
-}
-
-Fri 2024-05-31 00:00:48 - Successfully connected to the database.
-
-Fri 2024-05-31 00:00:48 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
-
-Fri 2024-05-31 00:00:48 - Response: HTTP/1.1 200 OK
-
-{
-	"status":	"success"
-}
-
-Fri 2024-05-31 00:00:50 - Client closed the connection
-
-Fri 2024-05-31 00:01:14 - Request from client: POST /api/login HTTP/1.1
-Host: localhost
-Content-Type: application/json
-Content-Length: 45
-
-{
-	"username":	"Horia",
-	"password":	"1234"
-}
-
-Fri 2024-05-31 00:01:14 - Successfully connected to the database.
-
-Fri 2024-05-31 00:01:14 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
-
-Fri 2024-05-31 00:01:14 - Response: HTTP/1.1 200 OK
-
-{
-	"status":	"success"
-}
-
-Fri 2024-05-31 00:01:14 - Client closed the connection
-
-Fri 2024-05-31 00:02:00 - Request from client: POST /api/login HTTP/1.1
-Host: localhost
-Content-Type: application/json
-Content-Length: 45
-
-{
-	"username":	"Horia",
-	"password":	"1234"
-}
-
-Fri 2024-05-31 00:02:00 - Successfully connected to the database.
-
-Fri 2024-05-31 00:02:00 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
-
-Fri 2024-05-31 00:02:00 - Response: HTTP/1.1 200 OK
-
-{
-	"status":	"success"
-}
-
-Fri 2024-05-31 00:02:06 - Client closed the connection
-
-Fri 2024-05-31 00:02:14 - Request from client: POST /api/login HTTP/1.1
-Host: localhost
-Content-Type: application/json
-Content-Length: 45
-
-{
-	"username":	"Horia",
-	"password":	"1234"
-}
-
-Fri 2024-05-31 00:02:14 - Successfully connected to the database.
-
-Fri 2024-05-31 00:02:14 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
-
-Fri 2024-05-31 00:02:14 - Response: HTTP/1.1 200 OK
-
-{
-	"status":	"success"
-}
-
-Fri 2024-05-31 00:02:24 - Client closed the connection
-
-Fri 2024-05-31 00:02:28 - Request from client: POST /api/login HTTP/1.1
-Host: localhost
-Content-Type: application/json
-Content-Length: 45
-
-{
-	"username":	"Horia",
-	"password":	"1234"
-}
-
-Fri 2024-05-31 00:02:28 - Successfully connected to the database.
-
-Fri 2024-05-31 00:02:28 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
-
-Fri 2024-05-31 00:02:28 - Response: HTTP/1.1 200 OK
-
-{
-	"status":	"success"
-}
-
-Fri 2024-05-31 00:02:28 - Client closed the connection
-
-Fri 2024-05-31 00:02:45 - Request from client: POST /api/login HTTP/1.1
-Host: localhost
-Content-Type: application/json
-Content-Length: 45
-
-{
-	"username":	"Horia",
-	"password":	"1234"
-}
-
-Fri 2024-05-31 00:02:45 - Successfully connected to the database.
-
-Fri 2024-05-31 00:02:45 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
-
-Fri 2024-05-31 00:02:45 - Response: HTTP/1.1 200 OK
-
-{
-	"status":	"success"
-}
-
-Fri 2024-05-31 00:03:06 - Client closed the connection
-
-Fri 2024-05-31 00:03:10 - Request from client: POST /api/login HTTP/1.1
-Host: localhost
-Content-Type: application/json
-Content-Length: 45
-
-{
-	"username":	"Horia",
-	"password":	"1234"
-}
-
-Fri 2024-05-31 00:03:10 - Successfully connected to the database.
-
-Fri 2024-05-31 00:03:10 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
-
-Fri 2024-05-31 00:03:10 - Response: HTTP/1.1 200 OK
-
-{
-	"status":	"success"
-}
-
-Fri 2024-05-31 00:03:10 - Client closed the connection
-
-Fri 2024-05-31 00:03:32 - Request from client: POST /api/login HTTP/1.1
-Host: localhost
-Content-Type: application/json
-Content-Length: 45
-
-{
-	"username":	"Horia",
-	"password":	"1234"
-}
-
-Fri 2024-05-31 00:03:32 - Successfully connected to the database.
-
-Fri 2024-05-31 00:03:32 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
-
-Fri 2024-05-31 00:03:32 - Response: HTTP/1.1 200 OK
-
-{
-	"status":	"success"
-}
-
-Fri 2024-05-31 00:03:52 - Client closed the connection
-
-Fri 2024-05-31 00:05:07 - Client closed the connection
-
-Fri 2024-05-31 00:05:13 - Request from client: POST /api/login HTTP/1.1
-Host: localhost
-Content-Type: application/json
-Content-Length: 45
-
-{
-	"username":	"Horia",
-	"password":	"1234"
-}
-
-Fri 2024-05-31 00:05:13 - Successfully connected to the database.
-
-Fri 2024-05-31 00:05:13 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
-
-Fri 2024-05-31 00:05:13 - Response: HTTP/1.1 200 OK
-
-{
-	"status":	"success"
-}
-
-Fri 2024-05-31 00:05:27 - Request from client: POST /api/run HTTP/1.1
+Fri 2024-05-31 00:47:25 - Request from client: POST /api/run HTTP/1.1
 Host: localhost
 Content-Type: application/json
 Content-Length: 400
@@ -351,14 +42,37 @@ Content-Length: 400
 	"code":	"def is_prime(n):\n    if n <= 1:\n        return False\n    for i in range(2, n):\n        if n % i == 0:\n            return False\n    return True\n\ncount = 0\nnum = 2\nprime_numbers = []\n\nwhile count < 4:\n    if is_prime(num):\n        prime_numbers.append(num)\n        count += 1\n    num += 1\n\nprint(\"The first 4 prime numbers are:\", prime_numbers)"
 }
 
-Fri 2024-05-31 00:05:27 - Response python status: success
+Fri 2024-05-31 00:47:25 - Response python status: success
 
-Fri 2024-05-31 00:05:27 - Response: HTTP/1.1 200 OK
+Fri 2024-05-31 00:47:25 - Successfully connected to the database.
+
+Fri 2024-05-31 00:47:25 - SQL: INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('test_username', 'def is_prime(n):
+    if n <= 1:
+        return False
+    for i in range(2, n):
+        if n % i == 0:
+            return False
+    return True
+
+count = 0
+num = 2
+prime_numbers = []
+
+while count < 4:
+    if is_prime(num):
+        prime_numbers.append(num)
+        count += 1
+    num += 1
+
+print("The first 4 prime numbers are:", prime_numbers)', 'The first 4 prime numbers are: [2, 3, 5, 7]
+', '');
+
+Fri 2024-05-31 00:47:25 - Record inserted successfully
+
+Fri 2024-05-31 00:47:25 - Response: HTTP/1.1 200 OK
 
 {
 	"stdout":	"The first 4 prime numbers are: [2, 3, 5, 7]\n",
 	"stderr":	""
 }
-
-Fri 2024-05-31 00:05:54 - Client closed the connection
 

@@ -34,7 +34,6 @@ typedef struct HandleClientArgs
 
 void run_code(char *json_string, char *response_data, int readSize)
 {
-	// write_log("json string: %s\n", json_string);
 	ServerRequest req;
 	cJSON *server_req_json = cJSON_Parse(json_string);
 	if (server_req_json == NULL)
@@ -106,6 +105,7 @@ void run_code(char *json_string, char *response_data, int readSize)
 		write_log("ERROR: Failed to print server_resp_json_string.");
 	}
 
+	insertCodeSubmission("test_username", req.code, server_resp.stdout, server_resp.stderr);
 	snprintf(response_data, readSize, "%s", server_resp_json_string);
 	cJSON_Delete(server_req_json);
 	cJSON_Delete(server_resp_json);
@@ -136,6 +136,8 @@ void on_handleLogin(char *json_string, char *response_data)
 
 	// Now you have the username and password, you can use them as needed
 	int login_status = handleLogin(username, password);
+	if (login_status == 1)
+		updateActiveUser(username);
 
 	cJSON *response_json = cJSON_CreateObject();
 	cJSON_AddStringToObject(response_json, "status", (login_status == 1 ? "success" : "failed"));
@@ -309,6 +311,8 @@ void handle_client(void *arg)
 			break;
 		}
 	}
+
+	// TODO: do matching socket with username and logout at this point
 	close(*handleClientArgs->client_socket);
 }
 

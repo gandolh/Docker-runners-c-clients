@@ -36,7 +36,7 @@ void initialSeed()
     sqlite3 *db = get_db();
     char *err_msg = 0;
 
-    char *sql = "CREATE TABLE User(Username TEXT PRIMARY KEY, Password TEXT, LastActiveTime TEXT, IsActive INTEGER);";
+    char *sql = "CREATE TABLE User(Username TEXT PRIMARY KEY, Password TEXT, LastRequestTime TEXT, IsActive INTEGER);";
 
     int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
 
@@ -50,7 +50,21 @@ void initialSeed()
         write_log("Table User created successfully\n");
     }
 
-    char *sql_insert = "INSERT INTO User (Username, Password, LastActiveTime, IsActive) VALUES ('Horia', '1234', '', 0), ('Cristian', '4321', '', 0), ('Thomas', '5678', '', 0), ('admin', 'admin', '', 0);";
+    char *sql_create_code_submissions = "CREATE TABLE CodeSubmissions (Username TEXT, Code TEXT, Output TEXT, Error TEXT);";
+
+    rc = sqlite3_exec(db, sql_create_code_submissions, 0, 0, &err_msg);
+
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "Failed to create table CodeSubmissions: %s\n", err_msg);
+        sqlite3_free(err_msg);
+    }
+    else
+    {
+        write_log("Table CodeSubmissions created successfully\n");
+    }
+
+    char *sql_insert = "INSERT INTO User (Username, Password, LastRequestTime, IsActive) VALUES ('Horia', '1234', '', 0), ('Cristian', '4321', '', 0), ('Thomas', '5678', '', 0), ('admin', 'admin', '', 0);";
 
     rc = sqlite3_exec(db, sql_insert, 0, 0, &err_msg);
 
@@ -64,6 +78,88 @@ void initialSeed()
         write_log("Records created successfully\n");
     }
     sqlite3_close(db);
+}
+
+int updateActiveUser(const char *username)
+{
+    sqlite3 *db = get_db();
+    char *err_msg = 0;
+    char sql[256];
+    int rc;
+
+    snprintf(sql, sizeof(sql), "UPDATE User SET LastRequestTime = datetime('now'), IsActive = 1 WHERE Username='%s'", username);
+    write_log("SQL: %s\n", sql);
+    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "Failed to update record %s\n", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_close(db);
+        return 0;
+    }
+    else
+    {
+        write_log("Record updated successfully\n");
+        sqlite3_close(db);
+        return 1;
+    }
+}
+
+void insertCodeSubmission(char *const username, char const *code, char const *output, char const *error)
+{
+    sqlite3 *db = get_db();
+    char *err_msg = 0;
+    char *sql;
+    int rc;
+
+    char *escaped_code = sqlite3_mprintf("%q", code);
+    char *escaped_output = sqlite3_mprintf("%q", output);
+    char *escaped_error = sqlite3_mprintf("%q", error);
+
+    sql = sqlite3_mprintf("INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('%q', '%q', '%q', '%q');", username, escaped_code, escaped_output, escaped_error);
+
+    write_log("SQL: %s\n", sql);
+    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "Failed to insert record %s\n", err_msg);
+        sqlite3_free(err_msg);
+    }
+    else
+    {
+        write_log("Record inserted successfully\n");
+    }
+
+    sqlite3_free(escaped_code);
+    sqlite3_free(escaped_output);
+    sqlite3_free(escaped_error);
+    sqlite3_free(sql);
+    sqlite3_close(db);
+}
+
+int logOut(const char *username)
+{
+    sqlite3 *db = get_db();
+    char *err_msg = 0;
+    char sql[256];
+    int rc;
+
+    snprintf(sql, sizeof(sql), "UPDATE User SET IsActive = 0 WHERE Username='%s'", username);
+    write_log("SQL: %s\n", sql);
+    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "Failed to update record %s\n", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_close(db);
+        return 0;
+    }
+    else
+    {
+        write_log("Record updated successfully\n");
+        sqlite3_close(db);
+        return 1;
+    }
 }
 
 // returns 0 if fail, returns 1 if success
