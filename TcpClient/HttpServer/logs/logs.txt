@@ -1,6 +1,6 @@
-Thu 2024-05-30 20:58:23 - Log file created
-Thu 2024-05-30 20:58:27 - bind socket to port 6969
-Thu 2024-05-30 20:58:27 - Listening on port 6969
-Thu 2024-05-30 20:58:27 - HTTP Server Initialized
+Thu 2024-05-30 21:04:11 - Log file created
+Thu 2024-05-30 21:04:15 - bind socket to port 6969
+Thu 2024-05-30 21:04:15 - Listening on port 6969
+Thu 2024-05-30 21:04:15 - HTTP Server Initialized
 Port: 6969
 
