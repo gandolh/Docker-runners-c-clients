@@ -1,0 +1,80 @@
+Fri 2024-05-31 00:58:07 - Log file created
+Fri 2024-05-31 00:58:07 - Successfully connected to the database.
+
+Fri 2024-05-31 00:58:12 - bind socket to port 6969
+Fri 2024-05-31 00:58:12 - Listening on port 6969
+Fri 2024-05-31 00:58:12 - HTTP Server Initialized
+Port: 6969
+
+Fri 2024-05-31 00:58:16 - Request from client: POST /api/login HTTP/1.1
+Host: localhost
+Content-Type: application/json
+Content-Length: 45
+
+{
+	"username":	"Horia",
+	"password":	"1234"
+}
+
+Fri 2024-05-31 00:58:16 - Successfully connected to the database.
+
+Fri 2024-05-31 00:58:16 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
+
+Fri 2024-05-31 00:58:16 - Successfully connected to the database.
+
+Fri 2024-05-31 00:58:16 - SQL: UPDATE User SET LastRequestTime = datetime('now'), IsActive = 1 WHERE Username='Horia'
+
+Fri 2024-05-31 00:58:16 - Record updated successfully
+
+Fri 2024-05-31 00:58:16 - Response: HTTP/1.1 200 OK
+
+{
+	"status":	"success"
+}
+
+Fri 2024-05-31 00:58:27 - Request from client: POST /api/run HTTP/1.1
+Host: localhost
+Content-Type: application/json
+Content-Length: 400
+
+{
+	"language":	"PYTHON",
+	"code":	"def is_prime(n):\n    if n <= 1:\n        return False\n    for i in range(2, n):\n        if n % i == 0:\n            return False\n    return True\n\ncount = 0\nnum = 2\nprime_numbers = []\n\nwhile count < 4:\n    if is_prime(num):\n        prime_numbers.append(num)\n        count += 1\n    num += 1\n\nprint(\"The first 4 prime numbers are:\", prime_numbers)"
+}
+
+Fri 2024-05-31 00:58:27 - Response python status: success
+
+Fri 2024-05-31 00:58:27 - Successfully connected to the database.
+
+Fri 2024-05-31 00:58:27 - SQL: INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('test_username', 'def is_prime(n):
+    if n <= 1:
+        return False
+    for i in range(2, n):
+        if n % i == 0:
+            return False
+    return True
+
+count = 0
+num = 2
+prime_numbers = []
+
+while count < 4:
+    if is_prime(num):
+        prime_numbers.append(num)
+        count += 1
+    num += 1
+
+print("The first 4 prime numbers are:", prime_numbers)', 'The first 4 prime numbers are: [2, 3, 5, 7]
+', '');
+
+Fri 2024-05-31 00:58:27 - Record inserted successfully
+
+Fri 2024-05-31 00:58:27 - Response: HTTP/1.1 200 OK
+
+{
+	"stdout":	"The first 4 prime numbers are: [2, 3, 5, 7]\n",
+	"stderr":	""
+}
+
+Fri 2024-05-31 00:58:38 - Client closed the connection
+
