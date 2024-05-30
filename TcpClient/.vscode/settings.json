@@ -12,6 +12,7 @@
         "cjson.h": "c",
         "code_run_lib.h": "c",
         "errno.h": "c",
-        "response.h": "c"
+        "response.h": "c",
+        "socket.h": "c"
     }
 }
