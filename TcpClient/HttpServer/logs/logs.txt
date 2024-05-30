@@ -1,34 +1,6 @@
-Thu 2024-05-30 20:52:29 - Log file created
-Thu 2024-05-30 20:52:33 - bind socket to port 6969
-Thu 2024-05-30 20:52:33 - Listening on port 6969
-Thu 2024-05-30 20:52:33 - HTTP Server Initialized
+Thu 2024-05-30 20:58:23 - Log file created
+Thu 2024-05-30 20:58:27 - bind socket to port 6969
+Thu 2024-05-30 20:58:27 - Listening on port 6969
+Thu 2024-05-30 20:58:27 - HTTP Server Initialized
 Port: 6969
-
-Thu 2024-05-30 20:52:35 - Request from client: POST /api/run HTTP/1.1
-Content-Type: application/json
-User-Agent: PostmanRuntime/7.39.0
-Accept: */*
-Cache-Control: no-cache
-Postman-Token: d4ee1f9b-9b5e-4115-bca7-aeda3f739839
-Host: localhost:6969
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Length: 147
-
-{
-    "language": "C",
-    "code": "#include <stdio.h>\nint main() {\n    printf(\"Hello C\");\n    return 0;\n}",
-    "killAfterResponse": 1
-}
-
-Thu 2024-05-30 20:52:36 - Response status: success
-
-Thu 2024-05-30 20:52:36 - Response status: success, stderr: , stdout: Hello C
-
-Thu 2024-05-30 20:52:36 - Response: HTTP/1.1 200 OK
-
-{
-	"stdout":	"Hello C",
-	"stderr":	""
-}
 
