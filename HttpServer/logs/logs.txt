@@ -1,17 +1,17 @@
-Fri 2024-05-31 04:11:28 - Log file created
-Fri 2024-05-31 04:11:28 - Successfully connected to the database.
+Fri 2024-05-31 04:14:37 - Log file created
+Fri 2024-05-31 04:14:37 - Successfully connected to the database.
 
-Fri 2024-05-31 04:11:31 - bind socket to port 6969
-Fri 2024-05-31 04:11:31 - Listening on port 6969
-Fri 2024-05-31 04:11:31 - HTTP Server Initialized
+Fri 2024-05-31 04:14:40 - bind socket to port 6969
+Fri 2024-05-31 04:14:40 - Listening on port 6969
+Fri 2024-05-31 04:14:40 - HTTP Server Initialized
 Port: 6969
 
-Fri 2024-05-31 04:11:36 - Request from client: POST /api/run HTTP/1.1
+Fri 2024-05-31 04:14:43 - Request from client: POST /api/run HTTP/1.1
 Content-Type: application/json
 User-Agent: PostmanRuntime/7.39.0
 Accept: */*
 Cache-Control: no-cache
-Postman-Token: 4a331187-98c9-4962-a13e-30433f5ba6c9
+Postman-Token: ab864478-e121-4aef-ae24-543dfca57525
 Host: localhost:6969
 Accept-Encoding: gzip, deflate, br
 Connection: keep-alive
@@ -23,38 +23,38 @@ Content-Length: 123
     "killAfterResponse": 1
 }
 
-Fri 2024-05-31 04:11:36 - run rust
-Fri 2024-05-31 04:11:36 - Response status: error, stderr: error: expected one of `->`, `where`, or `{`, found `11`
+Fri 2024-05-31 04:14:43 - run rust
+Fri 2024-05-31 04:14:43 - Response status: error, stderr: error: expected one of `->`, `where`, or `{`, found `11`
 , stdout: 
 
-Fri 2024-05-31 04:11:36 - HELLO FRIEND: error: expected one of `->`, `where`, or `{`, found `11`
+Fri 2024-05-31 04:14:43 - HELLO FRIEND: error: expected one of `->`, `where`, or `{`, found `11`
 
-Fri 2024-05-31 04:11:36 - Error IM HERE: error: expected one of `->`, `where`, or `{`, found `11`
+Fri 2024-05-31 04:14:43 - Error IM HERE: error: expected one of `->`, `where`, or `{`, found `11`
 
 
-Fri 2024-05-31 04:11:36 - Successfully connected to the database.
+Fri 2024-05-31 04:14:43 - Successfully connected to the database.
 
-Fri 2024-05-31 04:11:36 - SQL: INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('test_username', 'fn main() 11{
+Fri 2024-05-31 04:14:43 - SQL: INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('test_username', 'fn main() 11{
  println!("Hello, Rust!");
  }
 ', '', 'error: expected one of `->`, `where`, or `{`, found `11`
 ');
 
-Fri 2024-05-31 04:11:36 - Record inserted successfully
+Fri 2024-05-31 04:14:43 - Record inserted successfully
 
-Fri 2024-05-31 04:11:36 - Response: HTTP/1.1 200 OK
+Fri 2024-05-31 04:14:43 - Response: HTTP/1.1 200 OK
 
 {
 	"stdout":	"",
 	"stderr":	"error: expected one of `->`, `where`, or `{`, found `11`\n"
 }
 
-Fri 2024-05-31 04:11:38 - Request from client: POST /api/run HTTP/1.1
+Fri 2024-05-31 04:14:46 - Request from client: POST /api/run HTTP/1.1
 Content-Type: application/json
 User-Agent: PostmanRuntime/7.39.0
 Accept: */*
 Cache-Control: no-cache
-Postman-Token: 99a42561-6d5d-4054-af7a-f39bce693bda
+Postman-Token: e5fd006d-8613-4216-b00a-9f615675dc65
 Host: localhost:6969
 Accept-Encoding: gzip, deflate, br
 Connection: keep-alive
@@ -66,62 +66,93 @@ Content-Length: 99
     "killAfterResponse": 1
 }
 
-Fri 2024-05-31 04:11:38 - Response python status: success
+Fri 2024-05-31 04:14:46 - Response python status: success
 
-Fri 2024-05-31 04:11:38 - Successfully connected to the database.
+Fri 2024-05-31 04:14:46 - Successfully connected to the database.
 
-Fri 2024-05-31 04:11:38 - SQL: INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('test_username', 'print("Hello PYTHON")', 'Hello PYTHON
+Fri 2024-05-31 04:14:46 - SQL: INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('test_username', 'print("Hello PYTHON")', 'Hello PYTHON
 ', '');
 
-Fri 2024-05-31 04:11:39 - Record inserted successfully
+Fri 2024-05-31 04:14:46 - Record inserted successfully
 
-Fri 2024-05-31 04:11:39 - Response: HTTP/1.1 200 OK
+Fri 2024-05-31 04:14:46 - Response: HTTP/1.1 200 OK
 
 {
 	"stdout":	"Hello PYTHON\n",
 	"stderr":	""
 }
 
-Fri 2024-05-31 04:11:42 - Request from client: POST /api/run HTTP/1.1
+Fri 2024-05-31 04:14:48 - Request from client: POST /api/run HTTP/1.1
 Content-Type: application/json
 User-Agent: PostmanRuntime/7.39.0
 Accept: */*
 Cache-Control: no-cache
-Postman-Token: 8463b7ba-03df-4b4a-b9cd-2119ffb69c05
+Postman-Token: 998c0efb-6776-40b7-ac36-3d2f8786696b
 Host: localhost:6969
 Accept-Encoding: gzip, deflate, br
 Connection: keep-alive
-Content-Length: 123
+Content-Length: 121
 
 {
     "language": "RUST",
-    "code": "fn main() 11{\n println!(\"Hello, Rust!\");\n }\n",
+    "code": "fn main() {\n println!(\"Hello, Rust!\");\n }\n",
     "killAfterResponse": 1
 }
 
-Fri 2024-05-31 04:11:42 - run rust
-Fri 2024-05-31 04:11:42 - Response status: error, stderr: error: expected one of `->`, `where`, or `{`, found `11`
-, stdout: 
+Fri 2024-05-31 04:14:48 - run rust
+Fri 2024-05-31 04:14:48 - Response status: success, stderr: , stdout: 
 
-Fri 2024-05-31 04:11:42 - HELLO FRIEND: error: expected one of `->`, `where`, or `{`, found `11`
-
-Fri 2024-05-31 04:11:42 - Error IM HERE: error: expected one of `->`, `where`, or `{`, found `11`
+Fri 2024-05-31 04:14:48 - HELLO FRIEND: 
+Fri 2024-05-31 04:14:48 - Response status: success, stderr: , stdout: Hello, Rust!
 
 
-Fri 2024-05-31 04:11:42 - Successfully connected to the database.
+Fri 2024-05-31 04:14:48 - Successfully connected to the database.
 
-Fri 2024-05-31 04:11:42 - SQL: INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('test_username', 'fn main() 11{
+Fri 2024-05-31 04:14:48 - SQL: INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('test_username', 'fn main() {
  println!("Hello, Rust!");
  }
-', '', 'error: expected one of `->`, `where`, or `{`, found `11`
-');
+', 'Hello, Rust!
+', '');
 
-Fri 2024-05-31 04:11:42 - Record inserted successfully
+Fri 2024-05-31 04:14:48 - Record inserted successfully
 
-Fri 2024-05-31 04:11:42 - Response: HTTP/1.1 200 OK
+Fri 2024-05-31 04:14:48 - Response: HTTP/1.1 200 OK
 
 {
-	"stdout":	"",
-	"stderr":	"error: expected one of `->`, `where`, or `{`, found `11`\n"
+	"stdout":	"Hello, Rust!\n",
+	"stderr":	""
+}
+
+Fri 2024-05-31 04:14:51 - Request from client: POST /api/login HTTP/1.1
+Content-Type: application/json
+User-Agent: PostmanRuntime/7.39.0
+Accept: */*
+Cache-Control: no-cache
+Postman-Token: 63fe7385-beaf-43dc-89ec-717e3b1a78e2
+Host: localhost:6969
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 77
+
+{
+  "username": "Horia",
+  "password": "1234",
+  "killAfterResponse": 1
+}
+
+Fri 2024-05-31 04:14:51 - Successfully connected to the database.
+
+Fri 2024-05-31 04:14:51 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
+
+Fri 2024-05-31 04:14:51 - Successfully connected to the database.
+
+Fri 2024-05-31 04:14:51 - SQL: UPDATE User SET LastRequestTime = datetime('now'), IsActive = 1 WHERE Username='Horia'
+
+Fri 2024-05-31 04:14:51 - Record updated successfully
+
+Fri 2024-05-31 04:14:51 - Response: HTTP/1.1 200 OK
+
+{
+	"status":	"success"
 }
 

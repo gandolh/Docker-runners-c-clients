@@ -1,10 +1,16 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
+#include <pthread.h>
 
-void write_log(const char *format, ...) {
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+
+void write_log(const char *format, ...)
+{
+    pthread_mutex_lock(&lock);
     FILE *file = fopen("logs/logs.txt", "a");
-    if (file == NULL) {
+    if (file == NULL)
+    {
         printf("Error opening logs file!\n");
         return;
     }
@@ -26,11 +32,14 @@ void write_log(const char *format, ...) {
 
     fprintf(file, "\n");
     fclose(file);
+    pthread_mutex_unlock(&lock);
 }
 
-void create_log_file() {
+void create_log_file()
+{
     FILE *file = fopen("logs/logs.txt", "w");
-    if (file == NULL) {
+    if (file == NULL)
+    {
         write_log("Error creating logs file!\n");
         return;
     }
@@ -38,5 +47,3 @@ void create_log_file() {
     fclose(file);
     write_log("Log file created");
 }
-
-
