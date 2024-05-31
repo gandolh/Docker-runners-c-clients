@@ -67,19 +67,36 @@ void run_code(char *json_string, char *response_data, int readSize)
 			write_log("Error: compiling C code\n");
 			return;
 		}
-		codeRunResp = RunCCode(resp->filename);
-		free(resp);
+		if (strlen(resp->stderr) > 1)
+		{
+			codeRunResp = resp;
+		}
+		else
+		{
+			codeRunResp = RunCCode(resp->filename);
+			free(resp);
+		}
 	}
 	else if (strcmp(req.language, "RUST") == 0)
 	{
+		write_log("run rust");
 		CodeRunnerResponse *resp = CompileRustCode(req.code);
 		if (resp == NULL)
 		{
 			write_log("Error: compiling Rust code\n");
 			return;
 		}
-		codeRunResp = RunRustCode(resp->filename);
-		free(resp);
+		write_log("HELLO FRIEND: %s", resp->stderr);
+		if (strlen(resp->stderr) > 1)
+		{
+			codeRunResp = resp;
+			write_log("Error IM HERE: %s\n", resp->stderr);
+		}
+		else
+		{
+			codeRunResp = RunRustCode(resp->filename);
+			free(resp);
+		}
 	}
 	else if (strcmp(req.language, "PYTHON") == 0)
 	{

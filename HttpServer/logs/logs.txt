@@ -1,80 +1,127 @@
-Fri 2024-05-31 00:58:07 - Log file created
-Fri 2024-05-31 00:58:07 - Successfully connected to the database.
+Fri 2024-05-31 04:11:28 - Log file created
+Fri 2024-05-31 04:11:28 - Successfully connected to the database.
 
-Fri 2024-05-31 00:58:12 - bind socket to port 6969
-Fri 2024-05-31 00:58:12 - Listening on port 6969
-Fri 2024-05-31 00:58:12 - HTTP Server Initialized
+Fri 2024-05-31 04:11:31 - bind socket to port 6969
+Fri 2024-05-31 04:11:31 - Listening on port 6969
+Fri 2024-05-31 04:11:31 - HTTP Server Initialized
 Port: 6969
 
-Fri 2024-05-31 00:58:16 - Request from client: POST /api/login HTTP/1.1
-Host: localhost
+Fri 2024-05-31 04:11:36 - Request from client: POST /api/run HTTP/1.1
 Content-Type: application/json
-Content-Length: 45
+User-Agent: PostmanRuntime/7.39.0
+Accept: */*
+Cache-Control: no-cache
+Postman-Token: 4a331187-98c9-4962-a13e-30433f5ba6c9
+Host: localhost:6969
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 123
 
 {
-	"username":	"Horia",
-	"password":	"1234"
+    "language": "RUST",
+    "code": "fn main() 11{\n println!(\"Hello, Rust!\");\n }\n",
+    "killAfterResponse": 1
 }
 
-Fri 2024-05-31 00:58:16 - Successfully connected to the database.
+Fri 2024-05-31 04:11:36 - run rust
+Fri 2024-05-31 04:11:36 - Response status: error, stderr: error: expected one of `->`, `where`, or `{`, found `11`
+, stdout: 
 
-Fri 2024-05-31 00:58:16 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
+Fri 2024-05-31 04:11:36 - HELLO FRIEND: error: expected one of `->`, `where`, or `{`, found `11`
 
-Fri 2024-05-31 00:58:16 - Successfully connected to the database.
+Fri 2024-05-31 04:11:36 - Error IM HERE: error: expected one of `->`, `where`, or `{`, found `11`
 
-Fri 2024-05-31 00:58:16 - SQL: UPDATE User SET LastRequestTime = datetime('now'), IsActive = 1 WHERE Username='Horia'
 
-Fri 2024-05-31 00:58:16 - Record updated successfully
+Fri 2024-05-31 04:11:36 - Successfully connected to the database.
 
-Fri 2024-05-31 00:58:16 - Response: HTTP/1.1 200 OK
+Fri 2024-05-31 04:11:36 - SQL: INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('test_username', 'fn main() 11{
+ println!("Hello, Rust!");
+ }
+', '', 'error: expected one of `->`, `where`, or `{`, found `11`
+');
+
+Fri 2024-05-31 04:11:36 - Record inserted successfully
+
+Fri 2024-05-31 04:11:36 - Response: HTTP/1.1 200 OK
 
 {
-	"status":	"success"
+	"stdout":	"",
+	"stderr":	"error: expected one of `->`, `where`, or `{`, found `11`\n"
 }
 
-Fri 2024-05-31 00:58:27 - Request from client: POST /api/run HTTP/1.1
-Host: localhost
+Fri 2024-05-31 04:11:38 - Request from client: POST /api/run HTTP/1.1
 Content-Type: application/json
-Content-Length: 400
+User-Agent: PostmanRuntime/7.39.0
+Accept: */*
+Cache-Control: no-cache
+Postman-Token: 99a42561-6d5d-4054-af7a-f39bce693bda
+Host: localhost:6969
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 99
 
 {
-	"language":	"PYTHON",
-	"code":	"def is_prime(n):\n    if n <= 1:\n        return False\n    for i in range(2, n):\n        if n % i == 0:\n            return False\n    return True\n\ncount = 0\nnum = 2\nprime_numbers = []\n\nwhile count < 4:\n    if is_prime(num):\n        prime_numbers.append(num)\n        count += 1\n    num += 1\n\nprint(\"The first 4 prime numbers are:\", prime_numbers)"
+    "language": "PYTHON",
+    "code": "print(\"Hello PYTHON\")",
+    "killAfterResponse": 1
 }
 
-Fri 2024-05-31 00:58:27 - Response python status: success
+Fri 2024-05-31 04:11:38 - Response python status: success
 
-Fri 2024-05-31 00:58:27 - Successfully connected to the database.
+Fri 2024-05-31 04:11:38 - Successfully connected to the database.
 
-Fri 2024-05-31 00:58:27 - SQL: INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('test_username', 'def is_prime(n):
-    if n <= 1:
-        return False
-    for i in range(2, n):
-        if n % i == 0:
-            return False
-    return True
-
-count = 0
-num = 2
-prime_numbers = []
-
-while count < 4:
-    if is_prime(num):
-        prime_numbers.append(num)
-        count += 1
-    num += 1
-
-print("The first 4 prime numbers are:", prime_numbers)', 'The first 4 prime numbers are: [2, 3, 5, 7]
+Fri 2024-05-31 04:11:38 - SQL: INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('test_username', 'print("Hello PYTHON")', 'Hello PYTHON
 ', '');
 
-Fri 2024-05-31 00:58:27 - Record inserted successfully
+Fri 2024-05-31 04:11:39 - Record inserted successfully
 
-Fri 2024-05-31 00:58:27 - Response: HTTP/1.1 200 OK
+Fri 2024-05-31 04:11:39 - Response: HTTP/1.1 200 OK
 
 {
-	"stdout":	"The first 4 prime numbers are: [2, 3, 5, 7]\n",
+	"stdout":	"Hello PYTHON\n",
 	"stderr":	""
 }
 
-Fri 2024-05-31 00:58:38 - Client closed the connection
+Fri 2024-05-31 04:11:42 - Request from client: POST /api/run HTTP/1.1
+Content-Type: application/json
+User-Agent: PostmanRuntime/7.39.0
+Accept: */*
+Cache-Control: no-cache
+Postman-Token: 8463b7ba-03df-4b4a-b9cd-2119ffb69c05
+Host: localhost:6969
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 123
+
+{
+    "language": "RUST",
+    "code": "fn main() 11{\n println!(\"Hello, Rust!\");\n }\n",
+    "killAfterResponse": 1
+}
+
+Fri 2024-05-31 04:11:42 - run rust
+Fri 2024-05-31 04:11:42 - Response status: error, stderr: error: expected one of `->`, `where`, or `{`, found `11`
+, stdout: 
+
+Fri 2024-05-31 04:11:42 - HELLO FRIEND: error: expected one of `->`, `where`, or `{`, found `11`
+
+Fri 2024-05-31 04:11:42 - Error IM HERE: error: expected one of `->`, `where`, or `{`, found `11`
+
+
+Fri 2024-05-31 04:11:42 - Successfully connected to the database.
+
+Fri 2024-05-31 04:11:42 - SQL: INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('test_username', 'fn main() 11{
+ println!("Hello, Rust!");
+ }
+', '', 'error: expected one of `->`, `where`, or `{`, found `11`
+');
+
+Fri 2024-05-31 04:11:42 - Record inserted successfully
+
+Fri 2024-05-31 04:11:42 - Response: HTTP/1.1 200 OK
+
+{
+	"stdout":	"",
+	"stderr":	"error: expected one of `->`, `where`, or `{`, found `11`\n"
+}
 

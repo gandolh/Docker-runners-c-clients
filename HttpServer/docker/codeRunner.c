@@ -12,6 +12,7 @@
 #include <stdarg.h>
 #include "cJSON.h"
 #include "uuid4.h"
+#include <fcntl.h>
 #define PORT 8080
 #define MAX_QUEUE 5
 #define REQ_BUFFER_SIZE 1024
@@ -77,19 +78,22 @@ char *generate_json_resp(const char *status, const char *filename, const char *s
 char *writeAndCompile(const char *code, const char *compiler, const char *extension)
 {
     mkdir("code", 0777);
+    mkdir("errors", 0777);
     mkdir("submissions", 0777);
 
     // Get current time
-    char buf[UUID4_LEN];
-    uuid4_init();
-    uuid4_generate(buf);
+    char uuid4buf[UUID4_LEN];
+    uuid4_generate(uuid4buf);
 
     // Create filename
     char filename[50];
-    snprintf(filename, sizeof(filename), "code/%s.%s", buf, extension);
+    snprintf(filename, sizeof(filename), "code/%s.%s", uuid4buf, extension);
+    // Create the error file path
+    char err_file_path[256];
+    sprintf(err_file_path, "errors/%s_error.txt", uuid4buf);
     // Create executable filename
     char exec_filename[50];
-    snprintf(exec_filename, sizeof(exec_filename), "submissions/%s", buf);
+    snprintf(exec_filename, sizeof(exec_filename), "submissions/%s", uuid4buf);
 
     // Open file
     FILE *file = fopen(filename, "w");
@@ -117,6 +121,19 @@ char *writeAndCompile(const char *code, const char *compiler, const char *extens
     }
     if (pid == 0)
     {
+        int err_file = open(err_file_path, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+        if (err_file == -1)
+        {
+            perror("open");
+            exit(EXIT_FAILURE);
+        }
+
+        // Redirect stderr to the file
+        if (dup2(err_file, STDERR_FILENO) == -1)
+        {
+            perror("dup2");
+            exit(EXIT_FAILURE);
+        }
         // Execute the compiler
         execlp(compiler, compiler, filename, "-o", exec_filename, NULL);
         perror("execlp");
@@ -134,7 +151,20 @@ char *writeAndCompile(const char *code, const char *compiler, const char *extens
         else
         {
             write_log("Compilation failed\n");
-            return generate_json_resp("error", "", "", "");
+
+            // Read the error message from the file
+            FILE *err_file = fopen(err_file_path, "r");
+            if (err_file == NULL)
+            {
+                perror("fopen");
+                exit(EXIT_FAILURE);
+            }
+
+            char *error_msg = malloc(256);   // allocate memory for the error message
+            fgets(error_msg, 256, err_file); // read the error message
+            fclose(err_file);
+
+            return generate_json_resp("error", "", "", error_msg);
         }
     }
 }
@@ -270,6 +300,9 @@ char *RunScript(const char *interpreter, const char *exec_path)
         close(stderr_pipe[1]); // Close the write end of the stderr pipe in the parent
 
         char stdout_buffer[4096], stderr_buffer[4096];
+        memset(stdout_buffer, 0, sizeof(stdout_buffer));
+        memset(stderr_buffer, 0, sizeof(stderr_buffer));
+
         read(stdout_pipe[0], stdout_buffer, sizeof(stdout_buffer));
         read(stderr_pipe[0], stderr_buffer, sizeof(stderr_buffer));
 
@@ -415,6 +448,7 @@ end:
 int main()
 {
     create_log_file();
+    uuid4_init();
     write_log("Starting Code Runner\n");
     int sockfd, newsockfd;
     socklen_t clilen;
@@ -452,8 +486,8 @@ int main()
     while (1)
     {
 
-        memset(response, 0, sizeof(response));
-        memset(receivedMsg, 0, sizeof(receivedMsg));
+        memset(response, 0, RES_BUFFER_SIZE);
+        memset(receivedMsg, 0, REQ_BUFFER_SIZE);
         // Accept actual connection from the client
         newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
         if (newsockfd < 0)
