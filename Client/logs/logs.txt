@@ -1,0 +1,17 @@
+Fri 2024-05-31 05:11:14 - Sending request to server
+Fri 2024-05-31 05:11:14 - Server closed the connection
+
+Fri 2024-05-31 05:12:58 - Sending request to server
+Fri 2024-05-31 05:12:58 - Response from server: HTTP/1.1 200 OK
+
+{
+	"stdout":	"The first 4 prime numbers are: [2, 3, 5, 7]\n",
+	"stderr":	""
+}
+Fri 2024-05-31 05:13:17 - Sending request to server
+Fri 2024-05-31 05:13:17 - Response from server: HTTP/1.1 200 OK
+
+{
+	"stdout":	"The first 4 prime numbers are: [2, 3, 5, 7]\n",
+	"stderr":	""
+}

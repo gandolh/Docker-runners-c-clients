@@ -80,6 +80,28 @@ void initialSeed()
     sqlite3_close(db);
 }
 
+void updateInactiveUser(char const *username)
+{
+    sqlite3 *db = get_db();
+    char *err_msg = 0;
+    char sql[256];
+    int rc;
+
+    snprintf(sql, sizeof(sql), "UPDATE User SET IsActive = 0 WHERE Username='%s'", username);
+    write_log("SQL: %s\n", sql);
+    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "Failed to update record %s\n", err_msg);
+        sqlite3_free(err_msg);
+    }
+    else
+    {
+        write_log("Record updated successfully\n");
+    }
+    sqlite3_close(db);
+}
+
 int updateActiveUser(const char *username)
 {
     sqlite3 *db = get_db();
@@ -102,6 +124,26 @@ int updateActiveUser(const char *username)
         write_log("Record updated successfully\n");
         sqlite3_close(db);
         return 1;
+    }
+}
+
+void resetUserActive()
+{
+    // set IsActive = 0 for all users
+    sqlite3 *db = get_db();
+    char *zErrMsg = 0;
+    char *sql = "UPDATE User SET IsActive = 0;";
+
+    int rc = sqlite3_exec(db, sql, 0, 0, &zErrMsg);
+
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }
+    else
+    {
+        fprintf(stdout, "All User deactivated successfully\n");
     }
 }
 

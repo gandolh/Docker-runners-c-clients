@@ -7,5 +7,7 @@ void rm_db();
 void initialSeed();
 int handleLogin(char const *username, char const *password);
 void updateActiveUser(char const *username);
+void updateInactiveUser(char const *username);
+void resetUserActive();
 void insertCodeSubmission(char *const username, char const *code, char const *output, char const *error);
 #endif

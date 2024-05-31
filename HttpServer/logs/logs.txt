@@ -1,158 +1,132 @@
-Fri 2024-05-31 04:14:37 - Log file created
-Fri 2024-05-31 04:14:37 - Successfully connected to the database.
+Fri 2024-05-31 05:12:40 - Log file created
+Fri 2024-05-31 05:12:40 - Successfully connected to the database.
 
-Fri 2024-05-31 04:14:40 - bind socket to port 6969
-Fri 2024-05-31 04:14:40 - Listening on port 6969
-Fri 2024-05-31 04:14:40 - HTTP Server Initialized
+Fri 2024-05-31 05:12:44 - Successfully connected to the database.
+
+Fri 2024-05-31 05:12:44 - bind socket to port 6969
+Fri 2024-05-31 05:12:44 - Listening on port 6969
+Fri 2024-05-31 05:12:44 - HTTP Server Initialized
 Port: 6969
 
-Fri 2024-05-31 04:14:43 - Request from client: POST /api/run HTTP/1.1
+Fri 2024-05-31 05:12:52 - Request from client: POST /api/login HTTP/1.1
+Host: localhost
 Content-Type: application/json
-User-Agent: PostmanRuntime/7.39.0
-Accept: */*
-Cache-Control: no-cache
-Postman-Token: ab864478-e121-4aef-ae24-543dfca57525
-Host: localhost:6969
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Length: 123
+Content-Length: 45
 
 {
-    "language": "RUST",
-    "code": "fn main() 11{\n println!(\"Hello, Rust!\");\n }\n",
-    "killAfterResponse": 1
+	"username":	"Horia",
+	"password":	"1234"
 }
 
-Fri 2024-05-31 04:14:43 - run rust
-Fri 2024-05-31 04:14:43 - Response status: error, stderr: error: expected one of `->`, `where`, or `{`, found `11`
-, stdout: 
+Fri 2024-05-31 05:12:52 - Successfully connected to the database.
 
-Fri 2024-05-31 04:14:43 - HELLO FRIEND: error: expected one of `->`, `where`, or `{`, found `11`
+Fri 2024-05-31 05:12:52 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
 
-Fri 2024-05-31 04:14:43 - Error IM HERE: error: expected one of `->`, `where`, or `{`, found `11`
+Fri 2024-05-31 05:12:52 - Successfully connected to the database.
 
+Fri 2024-05-31 05:12:52 - SQL: UPDATE User SET LastRequestTime = datetime('now'), IsActive = 1 WHERE Username='Horia'
 
-Fri 2024-05-31 04:14:43 - Successfully connected to the database.
+Fri 2024-05-31 05:12:52 - Record updated successfully
 
-Fri 2024-05-31 04:14:43 - SQL: INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('test_username', 'fn main() 11{
- println!("Hello, Rust!");
- }
-', '', 'error: expected one of `->`, `where`, or `{`, found `11`
-');
-
-Fri 2024-05-31 04:14:43 - Record inserted successfully
-
-Fri 2024-05-31 04:14:43 - Response: HTTP/1.1 200 OK
-
-{
-	"stdout":	"",
-	"stderr":	"error: expected one of `->`, `where`, or `{`, found `11`\n"
-}
-
-Fri 2024-05-31 04:14:46 - Request from client: POST /api/run HTTP/1.1
-Content-Type: application/json
-User-Agent: PostmanRuntime/7.39.0
-Accept: */*
-Cache-Control: no-cache
-Postman-Token: e5fd006d-8613-4216-b00a-9f615675dc65
-Host: localhost:6969
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Length: 99
-
-{
-    "language": "PYTHON",
-    "code": "print(\"Hello PYTHON\")",
-    "killAfterResponse": 1
-}
-
-Fri 2024-05-31 04:14:46 - Response python status: success
-
-Fri 2024-05-31 04:14:46 - Successfully connected to the database.
-
-Fri 2024-05-31 04:14:46 - SQL: INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('test_username', 'print("Hello PYTHON")', 'Hello PYTHON
-', '');
-
-Fri 2024-05-31 04:14:46 - Record inserted successfully
-
-Fri 2024-05-31 04:14:46 - Response: HTTP/1.1 200 OK
-
-{
-	"stdout":	"Hello PYTHON\n",
-	"stderr":	""
-}
-
-Fri 2024-05-31 04:14:48 - Request from client: POST /api/run HTTP/1.1
-Content-Type: application/json
-User-Agent: PostmanRuntime/7.39.0
-Accept: */*
-Cache-Control: no-cache
-Postman-Token: 998c0efb-6776-40b7-ac36-3d2f8786696b
-Host: localhost:6969
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Length: 121
-
-{
-    "language": "RUST",
-    "code": "fn main() {\n println!(\"Hello, Rust!\");\n }\n",
-    "killAfterResponse": 1
-}
-
-Fri 2024-05-31 04:14:48 - run rust
-Fri 2024-05-31 04:14:48 - Response status: success, stderr: , stdout: 
-
-Fri 2024-05-31 04:14:48 - HELLO FRIEND: 
-Fri 2024-05-31 04:14:48 - Response status: success, stderr: , stdout: Hello, Rust!
-
-
-Fri 2024-05-31 04:14:48 - Successfully connected to the database.
-
-Fri 2024-05-31 04:14:48 - SQL: INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('test_username', 'fn main() {
- println!("Hello, Rust!");
- }
-', 'Hello, Rust!
-', '');
-
-Fri 2024-05-31 04:14:48 - Record inserted successfully
-
-Fri 2024-05-31 04:14:48 - Response: HTTP/1.1 200 OK
-
-{
-	"stdout":	"Hello, Rust!\n",
-	"stderr":	""
-}
-
-Fri 2024-05-31 04:14:51 - Request from client: POST /api/login HTTP/1.1
-Content-Type: application/json
-User-Agent: PostmanRuntime/7.39.0
-Accept: */*
-Cache-Control: no-cache
-Postman-Token: 63fe7385-beaf-43dc-89ec-717e3b1a78e2
-Host: localhost:6969
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Content-Length: 77
-
-{
-  "username": "Horia",
-  "password": "1234",
-  "killAfterResponse": 1
-}
-
-Fri 2024-05-31 04:14:51 - Successfully connected to the database.
-
-Fri 2024-05-31 04:14:51 - SQL: SELECT * FROM User WHERE username='Horia' AND password='1234'
-
-Fri 2024-05-31 04:14:51 - Successfully connected to the database.
-
-Fri 2024-05-31 04:14:51 - SQL: UPDATE User SET LastRequestTime = datetime('now'), IsActive = 1 WHERE Username='Horia'
-
-Fri 2024-05-31 04:14:51 - Record updated successfully
-
-Fri 2024-05-31 04:14:51 - Response: HTTP/1.1 200 OK
+Fri 2024-05-31 05:12:52 - Response: HTTP/1.1 200 OK
 
 {
 	"status":	"success"
 }
+
+Fri 2024-05-31 05:12:58 - Request from client: POST /api/run HTTP/1.1
+Host: localhost
+Content-Type: application/json
+Content-Length: 400
+
+{
+	"language":	"PYTHON",
+	"code":	"def is_prime(n):\n    if n <= 1:\n        return False\n    for i in range(2, n):\n        if n % i == 0:\n            return False\n    return True\n\ncount = 0\nnum = 2\nprime_numbers = []\n\nwhile count < 4:\n    if is_prime(num):\n        prime_numbers.append(num)\n        count += 1\n    num += 1\n\nprint(\"The first 4 prime numbers are:\", prime_numbers)"
+}
+
+Fri 2024-05-31 05:12:58 - Response python status: success
+
+Fri 2024-05-31 05:12:58 - Successfully connected to the database.
+
+Fri 2024-05-31 05:12:58 - SQL: INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('Horia', 'def is_prime(n):
+    if n <= 1:
+        return False
+    for i in range(2, n):
+        if n % i == 0:
+            return False
+    return True
+
+count = 0
+num = 2
+prime_numbers = []
+
+while count < 4:
+    if is_prime(num):
+        prime_numbers.append(num)
+        count += 1
+    num += 1
+
+print("The first 4 prime numbers are:", prime_numbers)', 'The first 4 prime numbers are: [2, 3, 5, 7]
+', '');
+
+Fri 2024-05-31 05:12:58 - Record inserted successfully
+
+Fri 2024-05-31 05:12:58 - Response: HTTP/1.1 200 OK
+
+{
+	"stdout":	"The first 4 prime numbers are: [2, 3, 5, 7]\n",
+	"stderr":	""
+}
+
+Fri 2024-05-31 05:13:17 - Request from client: POST /api/run HTTP/1.1
+Host: localhost
+Content-Type: application/json
+Content-Length: 400
+
+{
+	"language":	"PYTHON",
+	"code":	"def is_prime(n):\n    if n <= 1:\n        return False\n    for i in range(2, n):\n        if n % i == 0:\n            return False\n    return True\n\ncount = 0\nnum = 2\nprime_numbers = []\n\nwhile count < 4:\n    if is_prime(num):\n        prime_numbers.append(num)\n        count += 1\n    num += 1\n\nprint(\"The first 4 prime numbers are:\", prime_numbers)"
+}
+
+Fri 2024-05-31 05:13:17 - Response python status: success
+
+Fri 2024-05-31 05:13:17 - Successfully connected to the database.
+
+Fri 2024-05-31 05:13:17 - SQL: INSERT INTO CodeSubmissions (Username, Code, Output, Error) VALUES ('Horia', 'def is_prime(n):
+    if n <= 1:
+        return False
+    for i in range(2, n):
+        if n % i == 0:
+            return False
+    return True
+
+count = 0
+num = 2
+prime_numbers = []
+
+while count < 4:
+    if is_prime(num):
+        prime_numbers.append(num)
+        count += 1
+    num += 1
+
+print("The first 4 prime numbers are:", prime_numbers)', 'The first 4 prime numbers are: [2, 3, 5, 7]
+', '');
+
+Fri 2024-05-31 05:13:17 - Record inserted successfully
+
+Fri 2024-05-31 05:13:17 - Response: HTTP/1.1 200 OK
+
+{
+	"stdout":	"The first 4 prime numbers are: [2, 3, 5, 7]\n",
+	"stderr":	""
+}
+
+Fri 2024-05-31 05:13:26 - Client closed the connection
+
+Fri 2024-05-31 05:13:26 - Successfully connected to the database.
+
+Fri 2024-05-31 05:13:26 - SQL: UPDATE User SET IsActive = 0 WHERE Username='Horia'
+
+Fri 2024-05-31 05:13:26 - Record updated successfully
 

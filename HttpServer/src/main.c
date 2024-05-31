@@ -25,6 +25,8 @@
 #define HEADER_BUFFER_SIZE 20
 #define RESPONSE_BUFFER_SIZE RESPONSE_DATA_BUFFER_SIZE + HEADER_BUFFER_SIZE
 #define PORT 6969
+#define MAX_USERNAME_SIZE 255
+#define DEFAULT_USER_NAME "unauthenticated_user"
 
 typedef struct HandleClientArgs
 {
@@ -32,7 +34,7 @@ typedef struct HandleClientArgs
 	int *client_socket;
 } HandleClientArgs;
 
-void run_code(char *json_string, char *response_data, int readSize)
+void run_code(char *json_string, char *response_data, int readSize, char *username)
 {
 	ServerRequest req;
 	cJSON *server_req_json = cJSON_Parse(json_string);
@@ -122,14 +124,14 @@ void run_code(char *json_string, char *response_data, int readSize)
 		write_log("ERROR: Failed to print server_resp_json_string.");
 	}
 
-	insertCodeSubmission("test_username", req.code, server_resp.stdout, server_resp.stderr);
+	insertCodeSubmission(username, req.code, server_resp.stdout, server_resp.stderr);
 	snprintf(response_data, readSize, "%s", server_resp_json_string);
 	cJSON_Delete(server_req_json);
 	cJSON_Delete(server_resp_json);
 	free(codeRunResp);
 }
 
-void on_handleLogin(char *json_string, char *response_data)
+void on_handleLogin(char *json_string, char *response_data, char *save_username)
 {
 	cJSON *json_data = cJSON_Parse(json_string);
 	if (json_data == NULL)
@@ -154,7 +156,10 @@ void on_handleLogin(char *json_string, char *response_data)
 	// Now you have the username and password, you can use them as needed
 	int login_status = handleLogin(username, password);
 	if (login_status == 1)
+	{
 		updateActiveUser(username);
+		strcpy(save_username, username);
+	}
 
 	cJSON *response_json = cJSON_CreateObject();
 	cJSON_AddStringToObject(response_json, "status", (login_status == 1 ? "success" : "failed"));
@@ -206,7 +211,7 @@ void SolveRouteHtmlPages(struct Route *route, char *urlRoute, int *client_socket
 }
 
 // 0 - keep alive, 1 - kill connection
-int SolveRouteApi(struct Route *route, char *urlRoute, char *body_start, int *client_socket)
+int SolveRouteApi(struct Route *route, char *urlRoute, char *body_start, int *client_socket, char *username)
 {
 	// response data to be sent to client. No header included
 	char *response_data = malloc(RESPONSE_DATA_BUFFER_SIZE);
@@ -217,11 +222,11 @@ int SolveRouteApi(struct Route *route, char *urlRoute, char *body_start, int *cl
 
 	if (strstr(urlRoute, "/run") != NULL)
 	{
-		run_code(body_start, response_data, RESPONSE_DATA_BUFFER_SIZE);
+		run_code(body_start, response_data, RESPONSE_DATA_BUFFER_SIZE, username);
 	}
 	if (strstr(urlRoute, "/login") != NULL)
 	{
-		on_handleLogin(body_start, response_data);
+		on_handleLogin(body_start, response_data, username);
 	}
 	// TODO:  write in response data a json with errorCode: '404'
 
@@ -268,6 +273,7 @@ int SolveRouteApi(struct Route *route, char *urlRoute, char *body_start, int *cl
 void handle_client(void *arg)
 {
 	HandleClientArgs *handleClientArgs = (HandleClientArgs *)arg;
+	char username[MAX_USERNAME_SIZE] = DEFAULT_USER_NAME;
 	// request got from client
 	char client_msg[CLIENT_BUFFER_SIZE] = "";
 
@@ -316,7 +322,7 @@ void handle_client(void *arg)
 		// solve route
 		if (strstr(urlRoute, "/api/") != NULL)
 		{
-			int shouldKill = SolveRouteApi(handleClientArgs->route, urlRoute, body_start, handleClientArgs->client_socket);
+			int shouldKill = SolveRouteApi(handleClientArgs->route, urlRoute, body_start, handleClientArgs->client_socket, username);
 			if (shouldKill)
 				break;
 		}
@@ -324,12 +330,13 @@ void handle_client(void *arg)
 		{
 			SolveRouteHtmlPages(handleClientArgs->route, urlRoute, handleClientArgs->client_socket);
 			// sent all html content, let's kill the connection
-			// printf("got here");
 			break;
 		}
 	}
 
 	// TODO: do matching socket with username and logout at this point
+	if (strcmp(username, DEFAULT_USER_NAME) != 0)
+		updateInactiveUser(username);
 	close(*handleClientArgs->client_socket);
 }
 
@@ -346,7 +353,7 @@ int main()
 	// just for testing
 	// codeRunLib_RunDemo();
 	// return 0;
-
+	resetUserActive();
 	HTTP_Server http_server;
 	struct Route *route;
 	threadpool thpool = thpool_init(12);
